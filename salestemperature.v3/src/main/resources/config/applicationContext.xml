@@ -1,0 +1,35 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+	<!--
+	<context:annotation-config />
+	-->
+	
+	<bean id="dataSource" class="com.salest.salestemperature.v3.dao.DataSource">
+		<property name="jdbcDriverName" value="com.cloudera.impala.jdbc41.Driver" />
+		<property name="connectionUrl" value="jdbc:impala://192.168.118.132:21050/salest" />
+	</bean>
+
+
+	<bean id="salesVolumeDao" class="com.salest.salestemperature.v3.dao.SalesVolumeDao">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<bean id="categoryDao" class="com.salest.salestemperature.v3.dao.CategoryDao">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<bean id="productSalesVolumeDao" class="com.salest.salestemperature.v3.dao.ProductSalesVolumeDao">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	
+	<bean id="popularProductsService" class="com.salest.salestemperature.v3.service.PopularProductsService">
+		<property name="categoryDao" ref="categoryDao" />
+		<property name="productSalesVolumeDao" ref="productSalesVolumeDao"/>
+	</bean>
+	
+</beans>
