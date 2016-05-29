@@ -88,7 +88,7 @@ public class DaoTest {
 		assertEquals(category.getName(), category.getName(), category_fo_product.getName());
 	}
 	
-	@Test
+	// @Test
 	public void listingProductsBySalesVolumeTest(){
 		
 		List<ProductSalesVolume> productsBySalesVolume = productSalesVolumeDao.listingProductsBySalesVolume();
@@ -98,5 +98,16 @@ public class DaoTest {
 		}
 
 		assertNotNull(productsBySalesVolume);
+	}
+	
+	//@Test
+	public void getAnnualSalesVolumeTest(){
+		Map<String, Object> mapAnnualSalseVolume = salesVolumeDao.getAnnualSalesVolume();
+		
+		for(String key : mapAnnualSalseVolume.keySet()){
+			System.out.println("[key]:" + key + "		[value]:" + mapAnnualSalseVolume.get(key));
+		}
+		
+		assertTrue(mapAnnualSalseVolume.size() > 1);
 	}
 }
