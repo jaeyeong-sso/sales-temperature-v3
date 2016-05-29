@@ -88,7 +88,7 @@ public class DaoTest {
 		assertEquals(category.getName(), category.getName(), category_fo_product.getName());
 	}
 	
-	// @Test
+	@Test
 	public void listingProductsBySalesVolumeTest(){
 		
 		List<ProductSalesVolume> productsBySalesVolume = productSalesVolumeDao.listingProductsBySalesVolume();

@@ -25,6 +25,6 @@ public class SalesvolumeServiceTest extends JerseyTest {
 	    public void salesvolumeResourceTest() {
 	    	//assertEquals("","");
 	        final String resultOfGetMontlySalesVolume = target("salesvolume/monthly_sales_vol").request().get(String.class);
-	        assertEquals("getMontlySalesVolume~", resultOfGetMontlySalesVolume);
+	        assertEquals("getMontlySalesVolume", resultOfGetMontlySalesVolume);
 	    }
 }
