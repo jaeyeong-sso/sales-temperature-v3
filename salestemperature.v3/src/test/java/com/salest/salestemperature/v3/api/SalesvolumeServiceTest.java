@@ -27,20 +27,33 @@ public class SalesvolumeServiceTest extends JerseyTest {
 	        return new ResourceConfig(SalesvolumeResource.class).property("contextConfigLocation", "classpath:/config/applicationContext.xml");  
 	    }
 	 
-	    //@Test
+	    @Test
 	    public void salesvolumeResourceTest() {
 	    	
 	    	Response response;
+	    	List<SalesVolume> responseListObj;
+	    	
+	        //response = target("salesvolume/monthly_sales_vol/2014").request().get(Response.class);
+	        //assertEquals("[monthly_sales_vol] : RESPONSE STATUS is not 200", response.getStatus(), 200);
+	        //responseListObj = response.readEntity(new GenericType<List<SalesVolume>>(){});
+	        //assertEquals("[monthly_sales_vol / 2014] : ", responseListObj.get(responseListObj.size()-1).getDate(), "2014-12");
 	        
-	        //response = target("salesvolume/annual_sales_vol_sum/2014").request().get(Response.class);
-	        //assertEquals("[annual_sales_vol_sum] : RESPONSE STATUS is not 200", response.getStatus(), 200);
+	        response = target("salesvolume/products_sales_vol/2014/커피").request().get(Response.class);
+	        responseListObj = response.readEntity(new GenericType<List<SalesVolume>>(){});
 	        
-	        response = target("salesvolume/monthly_sales_vol/2014").request().get(Response.class);
-	        assertEquals("[monthly_sales_vol] : RESPONSE STATUS is not 200", response.getStatus(), 200);
+	        assertNotNull(responseListObj);
 	        
-	        List<SalesVolume> responseListObj = response.readEntity(new GenericType<List<SalesVolume>>(){});
-	  
-	        assertEquals("[monthly_sales_vol / 2014] : ", responseListObj.get(responseListObj.size()-1).getDate(), "2014-12");
+	       // response = target("salesvolume/products_sales_vol/2014/더치").request().get(Response.class);
+	        //responseListObj = response.readEntity(new GenericType<List<SalesVolume>>(){});
 	        
+	        
+	        for(SalesVolume item : responseListObj){
+	        	System.out.println(item.toString());
+	        }
+	        
+	        assertNotNull(responseListObj);
+	        
+	        //assertEquals("[products_sales_vol / 2014] : ", responseListObj.get(responseListObj.size()-1).getDate(), "2014-12");
 	    }
+	    
 }

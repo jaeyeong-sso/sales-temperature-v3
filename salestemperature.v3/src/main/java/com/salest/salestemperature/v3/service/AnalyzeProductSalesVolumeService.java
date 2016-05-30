@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.salest.salestemperature.v3.api.model.AnnualSalesVolumeSummary;
 import com.salest.salestemperature.v3.dao.CategoryDao;
 import com.salest.salestemperature.v3.dao.ProductSalesVolumeDao;
 import com.salest.salestemperature.v3.dao.SalesVolumeDao;
@@ -16,10 +17,11 @@ import com.salest.salestemperature.v3.model.ProductSalesVolume;
 import com.salest.salestemperature.v3.model.SalesVolume;
 
 
-public class PopularProductsService {
+public class AnalyzeProductSalesVolumeService {
 	
 	private CategoryDao categoryDao;
 	private ProductSalesVolumeDao productSalesVolumeDao;
+	private SalesVolumeDao salesVolumeDao;
 	
 	public void setCategoryDao(CategoryDao categoryDao){
 		this.categoryDao = categoryDao;
@@ -29,7 +31,34 @@ public class PopularProductsService {
 		this.productSalesVolumeDao = productSalesVolumeDao;
 	}
 	
+	public void setSalesVolumeDao(SalesVolumeDao salesVolumeDao){
+		this.salesVolumeDao = salesVolumeDao;
+	}
 
+	
+	public AnnualSalesVolumeSummary getAnnualSalesVolume(String queryYear){
+		
+		Map<String,Object> mapAnnualSalesVolume = salesVolumeDao.getAnnualSalesVolume(queryYear);
+		
+		long totalNumOfDate = (Long) mapAnnualSalesVolume.get("total_num_of_date");
+		long totalNumOfProduct = (Long) mapAnnualSalesVolume.get("total_num_of_product");
+		long totalAmount = (Long) mapAnnualSalesVolume.get("total_amount");
+		
+		
+		AnnualSalesVolumeSummary annualSalesVolumeSummary = new AnnualSalesVolumeSummary();
+		
+		annualSalesVolumeSummary.setTotalSalesCount((int) totalNumOfProduct);
+		annualSalesVolumeSummary.setTotalSalesAmount(totalAmount);
+		annualSalesVolumeSummary.setAvrgSalesCount((int) (totalNumOfProduct/totalNumOfDate));
+		annualSalesVolumeSummary.setAvrgSalesAmount(totalAmount/totalNumOfDate);
+		
+		return annualSalesVolumeSummary;
+	}
+	
+	public List<SalesVolume> listingMonthlySalesVolume(String queryYear){
+		return salesVolumeDao.listingMonthlySalesVolume(queryYear);
+	}
+	
 	private void addNewProductToExistCategories(List<Category> categories, final Product product){
 		
 		Category targetCateItem = (Category) CollectionUtils.find(categories, new org.apache.commons.collections.Predicate() {
@@ -47,7 +76,6 @@ public class PopularProductsService {
 			}
 		}
 	}
-	
 	
 	public List<Category> getMostPopularProducts(){
 
@@ -79,10 +107,17 @@ public class PopularProductsService {
 					System.out.println("	[Product] : " + product.getName() );
 				}
 			}
-		
 		}
 		
 		return popularProducts;
+	}
+	
+	public List<SalesVolume> getMonthlySalesVolumeByCategories(String queryYear){
+		return salesVolumeDao.listingCategoriesMonthlySalesVolume(queryYear);
+	}
+	
+	public List<SalesVolume> getMonthlySalesVolumeByProducts(String queryYear, String categoryName){
+		return salesVolumeDao.listingProductsMonthlySalesVolume(queryYear, categoryName);
 	}
 
 }

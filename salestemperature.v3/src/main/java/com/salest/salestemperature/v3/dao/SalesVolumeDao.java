@@ -28,6 +28,28 @@ public class SalesVolumeDao {
 		}
 	};
 	
+	private RowMapper<SalesVolume> salesVolumeListMapperWithCategoryOptItemName = new RowMapper<SalesVolume>(){
+		public SalesVolume mapRow(ResultSet rs,int rowNumber) throws SQLException{
+			return new SalesVolume.SalesVolumeBuilder()
+					.withDate(rs.getString("tr_date"))
+					.withOptItemName(rs.getString("cate_name"))
+					.withTotalSalesCount(rs.getInt("num_of_product"))
+					.withTotalSalesAmount(rs.getLong("total_amount"))
+					.build();
+		}
+	};
+	
+	private RowMapper<SalesVolume> salesVolumeListMapperWithProductOptItemName = new RowMapper<SalesVolume>(){
+		public SalesVolume mapRow(ResultSet rs,int rowNumber) throws SQLException{
+			return new SalesVolume.SalesVolumeBuilder()
+					.withDate(rs.getString("tr_date"))
+					.withOptItemName(rs.getString("product_name"))
+					.withTotalSalesCount(rs.getInt("num_of_product"))
+					.withTotalSalesAmount(rs.getLong("total_amount"))
+					.build();
+		}
+	};
+	
 	public List<SalesVolume> listingMonthlySalesVolume(String queryYear){
 		
 		String queryStr = "SELECT tr_date, SUM(num_of_product) AS num_of_product, (SUM(sales_amount)/10000) AS total_amount " +
@@ -53,4 +75,36 @@ public class SalesVolumeDao {
 	}
 	
 	
+	public List<SalesVolume> listingCategoriesMonthlySalesVolume(String queryYear){
+		
+		String queryStr =     
+		        "SELECT tr_date,cate_name, SUM(num_of_product) AS num_of_product, SUM(sales_amount) AS total_amount FROM (" +
+		            "SELECT SUBSTR(date_receipt_num,1,7) AS tr_date,cate_name, product_name, product_code,sales_amount,num_of_product FROM (" +
+		                "SELECT ext_tr_receipt.date_receipt_num, ext_tr_receipt.product_code, product_name,cate_name, sales_amount, num_of_product " +
+		                "FROM ext_tr_receipt JOIN ext_menumap_info USING (product_code)" +
+		            ") view_ext_tr_reciept_with_cate_name " +
+		            "WHERE SUBSTR(date_receipt_num,1,4)='" + queryYear + "' AND sales_amount != 0" +
+		        ") view_monthly_cate_product_sales_vol " +
+		        "GROUP BY tr_date,cate_name " + 
+		        "ORDER BY tr_date,cate_name ASC";
+				
+		return this.jdbcTemplate.query(queryStr, salesVolumeListMapperWithCategoryOptItemName);
+	}
+	
+	public List<SalesVolume> listingProductsMonthlySalesVolume(String queryYear, String categoryName){
+		
+		String queryStr =  
+		        "SELECT tr_date, product_name, SUM(num_of_product) AS num_of_product, SUM(sales_amount) AS total_amount FROM (" +
+		            "SELECT SUBSTR(date_receipt_num,1,7) AS tr_date,cate_name, product_name, product_code,sales_amount,num_of_product FROM (" +
+		                "SELECT ext_tr_receipt.date_receipt_num, ext_tr_receipt.product_code, product_name,cate_name, sales_amount, num_of_product " +
+		                "FROM ext_tr_receipt JOIN ext_menumap_info USING (product_code)" +
+		            ") view_ext_tr_reciept_with_cate_name " +
+		            "WHERE SUBSTR(date_receipt_num,1,4)='" + queryYear + "' AND sales_amount != 0" + " AND cate_name='" + categoryName + "'" +
+		        ") view_monthly_cate_product_sales_vol " +
+		        "GROUP BY tr_date,cate_name,product_code,product_name " + 
+		        "ORDER BY tr_date,cate_name,product_code,product_name ASC";
+						    
+				
+		return this.jdbcTemplate.query(queryStr, salesVolumeListMapperWithProductOptItemName);
+	}
 }

@@ -27,9 +27,10 @@
 	</bean>
 	
 	
-	<bean id="popularProductsService" class="com.salest.salestemperature.v3.service.PopularProductsService">
+	<bean id="popularProductsService" class="com.salest.salestemperature.v3.service.AnalyzeProductSalesVolumeService">
 		<property name="categoryDao" ref="categoryDao" />
-		<property name="productSalesVolumeDao" ref="productSalesVolumeDao"/>
+		<property name="productSalesVolumeDao" ref="productSalesVolumeDao" />
+		<property name="salesVolumeDao" ref="salesVolumeDao" />
 	</bean>
 	
 </beans>

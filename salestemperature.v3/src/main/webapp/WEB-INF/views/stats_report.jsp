@@ -221,6 +221,7 @@
 					}
 				});
 			}
+            
             funcSelectCategoryItem = function(element){            
                 funcDefaultSelectCategoryItem(element, curSelectYear);
             }
@@ -353,6 +354,7 @@
         	
         	funcLoadDescSalesVolumeData("2014");
         	funcLoadMonthlySalesVolumeData("2014");
+        	funcLoadProductCategorySalesVolumeData("2014");
         })
 		
 	</script>
