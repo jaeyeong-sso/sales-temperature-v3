@@ -47,4 +47,24 @@ public class CategoryDao {
 			}
 		});
 	}
+	
+	
+	public Map<String, Object> listingProductsSalesVolume(String queryYear, String categoryName){
+		
+		String queryStr =  
+		        "SELECT tr_date,cate_name,product_code,product_name, SUM(num_of_product) AS num_of_product, SUM(sales_amount) AS total_amount FROM (" +
+		            "SELECT SUBSTR(date_receipt_num,1,7) AS tr_date,cate_name, product_name, product_code,sales_amount,num_of_product FROM (" +
+		                "SELECT ext_tr_receipt.date_receipt_num, ext_tr_receipt.product_code, product_name,cate_name, sales_amount, num_of_product " +
+		                "FROM ext_tr_receipt JOIN ext_menumap_info USING (product_code)" +
+		            ") view_ext_tr_reciept_with_cate_name " +
+		            "WHERE SUBSTR(date_receipt_num,1,4)='" + queryYear + "' AND sales_amount != 0" + " AND cate_name='" + categoryName + "'" +
+		        ") view_monthly_cate_product_sales_vol " +
+		        "GROUP BY tr_date,cate_name,product_code,product_name " + 
+		        "ORDER BY tr_date,cate_name,product_code,product_name ASC";
+						    
+				
+		Map<String, Object> productsSalseVolume = this.jdbcTemplate.queryForMap(queryStr);
+		
+		return productsSalseVolume;
+	}
 }

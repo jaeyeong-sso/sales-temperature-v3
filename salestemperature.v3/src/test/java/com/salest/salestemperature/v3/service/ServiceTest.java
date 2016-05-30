@@ -30,7 +30,7 @@ public class ServiceTest {
 		assertNotNull(popularProductsService);
 	}
 	
-	//@Test
+	@Test
 	public void getPopularProductsTest(){
 		assertTrue("getMostPopularProducts <= 0 ", this.popularProductsService.getMostPopularProducts().size() > 0);
 	}

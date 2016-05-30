@@ -45,10 +45,10 @@ public class DaoTest {
 		assertNotNull(productSalesVolumeDao);
 	}
 	
-	// @Test
+	//@Test
 	public void getMonthlySalesVolumesTest(){
 		
-		List<SalesVolume> salesVolumes = salesVolumeDao.listingMonthlySalesVolume();
+		List<SalesVolume> salesVolumes = salesVolumeDao.listingMonthlySalesVolume("2015");
 		
 		for(int i=0; i<salesVolumes.size(); i++){
 			System.out.println(salesVolumes.get(i).getDate() + " " +
@@ -57,11 +57,6 @@ public class DaoTest {
 		}
 		
 		assertTrue("Get MonthlySalesVolumes", salesVolumes.size() > 0 );
-	}
-	
-	//@Test
-	public void getAnnualSalesVolume(){
-		assertTrue(salesVolumeDao.getAnnualSalesVolume().size()>0);
 	}
 	
 	// @Test
@@ -102,7 +97,7 @@ public class DaoTest {
 	
 	//@Test
 	public void getAnnualSalesVolumeTest(){
-		Map<String, Object> mapAnnualSalseVolume = salesVolumeDao.getAnnualSalesVolume();
+		Map<String, Object> mapAnnualSalseVolume = salesVolumeDao.getAnnualSalesVolume("2015");
 		
 		for(String key : mapAnnualSalseVolume.keySet()){
 			System.out.println("[key]:" + key + "		[value]:" + mapAnnualSalseVolume.get(key));

@@ -71,7 +71,7 @@ public class PopularProductsService {
 		    });
 			
 			this.addNewProductToExistCategories(popularProducts, targetProduct);
-			/*
+		
 			for(Category category : popularProducts){
 				System.out.println("[category] : " + category.getName());
 				
@@ -79,7 +79,7 @@ public class PopularProductsService {
 					System.out.println("	[Product] : " + product.getName() );
 				}
 			}
-			*/
+		
 		}
 		
 		return popularProducts;

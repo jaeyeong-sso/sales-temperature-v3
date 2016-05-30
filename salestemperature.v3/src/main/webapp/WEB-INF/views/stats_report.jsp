@@ -85,16 +85,16 @@
             var line_chart = Morris.Line({
                 element: 'monthly-sales-volume-chart',
                 data: dataArr_montlyTotalSalesVolume,	//jsonObj,
-                xkey: 'year_month',
-                ykeys: ['num_of_product','total_amount'],
-                labels: ['num_of_product','total_amount'],
+                xkey: 'date',
+                ykeys: ['totalSalesCount','totalSalesAmount'],
+                labels: ['Product Count','Total Amount'],
                 pointSize: 2,
                 hideHover: 'auto',
                 hoverCallback: function(index, options, content, row) {
-                    var new_content = $("<div class='morris-hover-row-label'><span id='year_month'></span></div><div class='morris-hover-point' style='color: #0b62a4'><span id='num_of_product'></span></div><div class='morris-hover-point' style='color: #7A92A3'><span id='total_amount'></span></div>");
-                    $('#year_month', new_content).html(row.year_month);
-                    $('#num_of_product',new_content).html(row.num_of_product + " 건");
-                    $('#total_amount',new_content).html(row.total_amount + " 만원");
+                    var new_content = $("<div class='morris-hover-row-label'><span id='date'></span></div><div class='morris-hover-point' style='color: #0b62a4'><span id='num_of_product'></span></div><div class='morris-hover-point' style='color: #7A92A3'><span id='total_amount'></span></div>");
+                    $('#date', new_content).html(row.date);
+                    $('#num_of_product',new_content).html(row.totalSalesCount + " items");
+                    $('#total_amount',new_content).html(row.totalSalesAmount + " KRW");
                     return (new_content);
                 },
                 
@@ -231,14 +231,14 @@
                     type: "GET",
                     dataType: "json",
                     contentType: "application/json",
-                    url: "/salest_dashbd/api/monthly_sales_vol/" + year,
+                    url: "/salestemperature.v3/api/salesvolume/monthly_sales_vol/" + year,
                     beforeSend : function(){
                         $('#myModal').modal('show');
                     },
                     success: function (response) {
-                        var jsonObj = $.parseJSON(response);
+               
                         dataArr_montlyTotalSalesVolume.length = 0;
-                        dataArr_montlyTotalSalesVolume = $.extend(true, [], jsonObj);
+                        dataArr_montlyTotalSalesVolume = $.extend(true, [], response);
                         
 						line_chart.setData(dataArr_montlyTotalSalesVolume);
 						line_chart.redraw();
@@ -258,16 +258,16 @@
                     type: "GET",
                     dataType: "json",
                     contentType: "application/json",
-                    url: "/salest_dashbd/api/desc_total_sales_vol/" + year,
+                    url: "/salestemperature.v3/api/salesvolume/annual_sales_vol_sum/" + year,
                     beforeSend : function(){
                         $('#myModal').modal('show');
                     },
                     success: function (response) {
-                        var jsonObj = $.parseJSON(response);
-                        var num_of_product = jsonObj.num_of_product.sum;
-                        var total_of_amount = parseInt(jsonObj.total_amount.sum / 10000)
-                        var avrg_sales_count = jsonObj.num_of_product.mean;
-                        var avrg_sales_amount = parseInt(jsonObj.total_amount.mean / 10000)
+
+                        var num_of_product = response.totalSalesCount;
+                        var total_of_amount = parseInt(response.totalSalesAmount / 10000)
+                        var avrg_sales_count = response.avrgSalesCount;
+                        var avrg_sales_amount = parseInt(response.avrgSalesAmount / 10000)
                         $('#total_sales_count').text(num_of_product);
                         $('#total_sales_amount').text(total_of_amount);
                         $('#avrg_sales_count').text(avrg_sales_count);
@@ -350,6 +350,9 @@
             
         $(window).load(function(){
         	//funcQueryReportPerYear('2015');
+        	
+        	funcLoadDescSalesVolumeData("2014");
+        	funcLoadMonthlySalesVolumeData("2014");
         })
 		
 	</script>
