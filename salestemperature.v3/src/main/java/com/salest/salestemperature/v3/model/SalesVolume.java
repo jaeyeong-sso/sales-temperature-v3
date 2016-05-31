@@ -1,5 +1,7 @@
 package com.salest.salestemperature.v3.model;
 
+import java.util.Comparator;
+
 public class SalesVolume {
 
 	public static final String DEFAULT_DATE_FIELD_VALUE = "DATE_TOTAL";
@@ -29,6 +31,17 @@ public class SalesVolume {
 	public long getTotalSalesAmount(){
 		return this.totalSalesAmount;
 	}
+	
+	@Override
+	public String toString() {
+		
+		return new StringBuffer("date: ").append(this.date)
+				.append(",  optItemName: ").append(this.optItemName)
+				.append(",  totalSalesAmount: ").append(this.totalSalesAmount)
+				.append(",  totalSalesCount: ").append(this.totalSalesCount).toString();
+
+	}
+	
 	
 	public static class SalesVolumeBuilder {
 		
@@ -68,4 +81,6 @@ public class SalesVolume {
 			return this;
 		}
 	}
+
+
 }

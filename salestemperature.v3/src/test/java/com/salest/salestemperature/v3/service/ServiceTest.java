@@ -33,12 +33,7 @@ public class ServiceTest {
 	public void beanLoadingTest(){
 		assertNotNull(analyzeProductSalesVolumeService);
 	}
-	
-	//@Test
-	public void getPopularProductsTest(){
-		assertTrue("getMostPopularProducts <= 0 ", analyzeProductSalesVolumeService.getMostPopularProducts().size() > 0);
-	}
-	
+
 	//@Test
 	public void salesContributionPerMenuTest(){
 		

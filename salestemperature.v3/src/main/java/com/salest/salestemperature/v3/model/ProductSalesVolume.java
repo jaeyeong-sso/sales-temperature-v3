@@ -4,12 +4,14 @@ public class ProductSalesVolume {
 	
 	private String id;
 	private String cateName;
+	private String productName;
 	private int totalSalesCount;
 	private long totalSalesAmount;
 	
 	private ProductSalesVolume(ProductSalesVolumeBuilder builder){
 		this.id = builder.id;
 		this.cateName = builder.cateName;
+		this.productName = builder.productName;
 		this.totalSalesCount = builder.totalSalesCount;
 		this.totalSalesAmount = builder.totalSalesAmount;
 	}
@@ -19,6 +21,9 @@ public class ProductSalesVolume {
 	}
 	public String getCateName(){
 		return this.cateName;
+	}
+	public String getProductName(){
+		return this.productName;
 	}
 	public int getTotalSalesCount(){
 		return this.totalSalesCount;
@@ -31,12 +36,14 @@ public class ProductSalesVolume {
 		
 		private String id;
 		private String cateName;
+		private String productName;
 		private int totalSalesCount;
 		private long totalSalesAmount;
 		
 		public ProductSalesVolumeBuilder(){
 			this.id = null;
 			this.cateName = null;
+			this.productName = null;
 			this.totalSalesCount = 0;
 			this.totalSalesAmount = 0L;
 		}
@@ -50,6 +57,10 @@ public class ProductSalesVolume {
 		}
 		public ProductSalesVolumeBuilder withCateName(String cateName){
 			this.cateName = cateName;
+			return this;
+		}
+		public ProductSalesVolumeBuilder withProductName(String productName){
+			this.productName = productName;
 			return this;
 		}
 		public ProductSalesVolumeBuilder withTotalSalesCount(int totalSalesCount){

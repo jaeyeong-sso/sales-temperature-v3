@@ -22,14 +22,9 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 	
-	<bean id="productSalesVolumeDao" class="com.salest.salestemperature.v3.dao.ProductSalesVolumeDao">
-		<property name="dataSource" ref="dataSource" />
-	</bean>
-	
 	
 	<bean id="popularProductsService" class="com.salest.salestemperature.v3.service.AnalyzeProductSalesVolumeService">
 		<property name="categoryDao" ref="categoryDao" />
-		<property name="productSalesVolumeDao" ref="productSalesVolumeDao" />
 		<property name="salesVolumeDao" ref="salesVolumeDao" />
 	</bean>
 	

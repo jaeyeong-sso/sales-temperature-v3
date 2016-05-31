@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import com.salest.salestemperature.v3.api.model.AnnualSalesVolumeSummary;
 import com.salest.salestemperature.v3.dao.SalesVolumeDao;
+import com.salest.salestemperature.v3.model.Category;
 import com.salest.salestemperature.v3.model.SalesVolume;
 import com.salest.salestemperature.v3.service.AnalyzeProductSalesVolumeService;
 

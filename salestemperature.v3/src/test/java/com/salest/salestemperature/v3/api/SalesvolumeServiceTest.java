@@ -27,7 +27,7 @@ public class SalesvolumeServiceTest extends JerseyTest {
 	        return new ResourceConfig(SalesvolumeResource.class).property("contextConfigLocation", "classpath:/config/applicationContext.xml");  
 	    }
 	 
-	    @Test
+	    //@Test
 	    public void salesvolumeResourceTest() {
 	    	
 	    	Response response;
