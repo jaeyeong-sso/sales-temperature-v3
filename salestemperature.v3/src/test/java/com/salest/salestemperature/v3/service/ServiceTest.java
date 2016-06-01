@@ -12,6 +12,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.salest.salestemperature.v3.api.model.AnnualSalesVolumeSummary;
 import com.salest.salestemperature.v3.model.SalesVolume;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -34,17 +35,30 @@ public class ServiceTest {
 		assertNotNull(analyzeProductSalesVolumeService);
 	}
 
+	@Test
+	public void annualSalesVolumeTest(){
+		AnnualSalesVolumeSummary annualSalesVolumeSummary = analyzeProductSalesVolumeService.getAnnualSalesVolume("2014");
+	}
+	
+	
 	//@Test
 	public void salesContributionPerMenuTest(){
 		
-		List<SalesVolume> listResult = analyzeProductSalesVolumeService.getMonthlySalesVolumeByCategories("2014");
+		List<SalesVolume> listResult;
 		
-		for(SalesVolume categoryItem : listResult){
-			System.out.println(categoryItem.getDate() + " / " + categoryItem.getOptItemName() + " / " +
-					categoryItem.getTotalSalesCount() + " / " + categoryItem.getTotalSalesAmount());
+		listResult = analyzeProductSalesVolumeService.getMonthlySalesVolumeByCategories("2014");
+		
+		for(SalesVolume salesVolumeItem : listResult){
+			System.out.println(salesVolumeItem.toString());
 		}
+		/*
+		listResult = analyzeProductSalesVolumeService.getMonthlySalesVolumeByProducts("2014","¶ó¶¼");
 		
-		assertTrue(analyzeProductSalesVolumeService.getMonthlySalesVolumeByCategories("2014").size() > 0);
+		for(SalesVolume salesVolumeItem : listResult){
+			System.out.println(salesVolumeItem.toString());
+		}
+		*/
+		assertTrue(listResult.size() > 0);
 	}
 	
 }

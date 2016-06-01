@@ -112,58 +112,11 @@ public class DaoTest {
 		assertEquals(category.getName(), category.getName(), "커피");
 	}
 	
-	@Test
-	public void listingProductsMonthlySalesVolume(){
-		
-		List<SalesVolume> listResult = salesVolumeDao.listingProductsMonthlySalesVolume("2014", "커피");
-		Category category = categoryDao.listingMajorProductsOfCategory("커피");
-
-		Set<String> productNameKeySet = category.getProductsMap().keySet();
-			
-		List<SalesVolume> finalResultList = new ArrayList<SalesVolume>(); 
-		
-		Map<String,Integer> etcItemsToatalCountMap = new HashMap<String,Integer>();
-		Map<String,Long> etcItemsToatalAmountMap = new HashMap<String,Long>();
-		
-		for(SalesVolume itemSalesVolume : listResult){
-			if( productNameKeySet.contains(itemSalesVolume.getOptItemName())){
-				finalResultList.add(itemSalesVolume);
-			} else {
-				String dateKey = itemSalesVolume.getDate();
-				if(etcItemsToatalCountMap.containsKey(dateKey)){
-					etcItemsToatalCountMap.put(dateKey, etcItemsToatalCountMap.get(dateKey) + itemSalesVolume.getTotalSalesCount());
-					etcItemsToatalAmountMap.put(dateKey, etcItemsToatalAmountMap.get(dateKey) + itemSalesVolume.getTotalSalesAmount());
-				} else {
-					etcItemsToatalCountMap.put(dateKey, itemSalesVolume.getTotalSalesCount());
-					etcItemsToatalAmountMap.put(dateKey, itemSalesVolume.getTotalSalesAmount());
-				}
-			}
+	//@Test
+	public void listingCategoriesMonthlySalesVolumeTest(){
+		List<SalesVolume> categorySalesVolumes = salesVolumeDao.listingCategoriesMonthlySalesVolume("2014");
+		for(SalesVolume salesVolume : categorySalesVolumes){
+			System.out.println(salesVolume.toString());
 		}
-		
-		for(String key : etcItemsToatalCountMap.keySet()){
-			finalResultList.add(new SalesVolume.SalesVolumeBuilder()
-					.withDate(key)
-					.withOptItemName("ETC.")
-					.withTotalSalesCount(etcItemsToatalCountMap.get(key))
-					.withTotalSalesAmount(etcItemsToatalAmountMap.get(key))
-					.build());
-		}
-		
-		for(SalesVolume salesVolumItem : finalResultList){
-			System.out.println(salesVolumItem.toString());
-		}
-		
-		Collections.sort(finalResultList, new Comparator<SalesVolume>() {
-		    public int compare(SalesVolume o1, SalesVolume o2) {
-		        return o1.getDate().compareTo(o2.getDate());
-		    }
-		});
-
-		System.out.println("\r\n");
-		
-		for(SalesVolume salesVolumItem : finalResultList){
-			System.out.println(salesVolumItem.toString());
-		}
-		
 	}
 }

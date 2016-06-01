@@ -74,7 +74,7 @@
 			var area_chart = Morris.Area({
 		        element: 'per-product-category-sales-volume-chart',
 		        data: dataArr_PerProductCateSalesVolume,
-		        xkey: 'year_month',
+		        xkey: 'date',
 		        ykeys: keyArr_PerProductCateSalesVolume,
 		        labels: keyArr_PerProductCateSalesVolume,
 		        pointSize: 2,
@@ -289,29 +289,33 @@
                     type: "GET",
                     dataType: "json",
                     contentType: "application/json",
-                    url: "/salest_dashbd/api/monthly_product_cate_sales_amount/" + year,
+                    url: "/salestemperature.v3/api/salesvolume/products_sales_vol/" + year,
                     beforeSend : function(){
                         $('#myModal').modal('show');
                     },
                     success: function (response) {
-                        var jsonObj = $.parseJSON(response);
-                        var dataArr = jsonObj.total_amount;
-                        var dateKeyArr = [];	
-                        $.each(dataArr, function(key, value){
-                            for (var key in value) {
-                                if(key!='year_month'){
-                                    dateKeyArr.push(key);
-                                }
-                            }
-                        });
-                        menuCategoryItems = dateKeyArr.filter(function(item,idx,arr){
-                            return idx==arr.indexOf(item);
-                        });
+      
+       					var annualSalesAmount = [];
+       			
+                    	for(var monthlySalesVolItems in response){
+                    		var monthlySalesAmountObj = new Object();
+                    		monthlySalesAmountObj.date = response[monthlySalesVolItems].date;
+                    		
+                    		var itemList = response[monthlySalesVolItems].itemList;
+                    		for(var idx in itemList){
+                    			monthlySalesAmountObj[itemList[idx].itemName] = itemList[idx].totalSalesAmount;
+                    		}
+                    		
+                    		annualSalesAmount.push(monthlySalesAmountObj)
+                    	}
+                    	
                         // clear before items
                         dataArr_PerProductCateSalesVolume.length = 0;
                         keyArr_PerProductCateSalesVolume.length = 0;
-                        dataArr_PerProductCateSalesVolume = $.extend(true, [], dataArr);
-                        keyArr_PerProductCateSalesVolume = $.extend(true, [], menuCategoryItems);	
+                        
+                        keyArr_PerProductCateSalesVolume = $.extend(true, [], Object.keys(annualSalesAmount[0]));	
+                        dataArr_PerProductCateSalesVolume = $.extend(true, [], annualSalesAmount);
+
                         area_chart.options.labels = keyArr_PerProductCateSalesVolume;
                         area_chart.options.ykeys = keyArr_PerProductCateSalesVolume;
                         area_chart.setData(dataArr_PerProductCateSalesVolume);
@@ -319,11 +323,13 @@
                         
                         $("#menu_cate_items_list").children().remove();
                         
+                        /*
                         $.each(menuCategoryItems, function(key, value){
                             $("#menu_cate_items_list").append("<li><a href='#' onclick='funcSelectCategoryItem(this);return false;'>" + value + "</a></li>");
                         });
                         $("#menu_cate_items_list").append("<li><a href='#' onclick='funcSelectCategoryItem(this);return false;'>All</a></li>");
-                        
+           				*/
+           				
                         $('#myModal').modal('hide');
                     },
                     error: function () {

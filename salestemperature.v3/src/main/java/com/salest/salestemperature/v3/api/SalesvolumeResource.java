@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.salest.salestemperature.v3.api.model.AnnualSalesVolumeSummary;
+import com.salest.salestemperature.v3.api.model.SalesVolumeResponse;
 import com.salest.salestemperature.v3.dao.SalesVolumeDao;
 import com.salest.salestemperature.v3.model.Category;
 import com.salest.salestemperature.v3.model.SalesVolume;
@@ -83,9 +84,26 @@ public class SalesvolumeResource {
 	public Response getCategoriesSalesVolume(@PathParam("queryYear") String queryYear) {
 		
 		List<SalesVolume> itemSalesVolumes = analyzeProductSalesVolumeService.getMonthlySalesVolumeByCategories(queryYear);
+
+		List<SalesVolumeResponse> responseItemList = new ArrayList<SalesVolumeResponse>();
+
+		for(int monthIdx=1; monthIdx<=12; monthIdx++){
+			String dateKey = String.format("%s-%02d", queryYear,monthIdx);
+			
+			SalesVolumeResponse mothlySalesVolume = new SalesVolumeResponse(dateKey);
+			
+			for(SalesVolume itemSalseVolume : itemSalesVolumes){
+				if(itemSalseVolume.getDate().equals(dateKey)){
+					mothlySalesVolume.addItemList(
+							new SalesVolumeResponse.ItemDetail(itemSalseVolume.getOptItemName(), itemSalseVolume.getTotalSalesCount(), itemSalseVolume.getTotalSalesAmount()));
+				}
+			}
+			
+			responseItemList.add(mothlySalesVolume);
+		}
 		
 		if(itemSalesVolumes!=null){
-			return Response.status(200).entity(itemSalesVolumes).build();
+			return Response.status(200).entity(responseItemList).build();
 		} else {
 			return Response.status(500).build();
 		}
