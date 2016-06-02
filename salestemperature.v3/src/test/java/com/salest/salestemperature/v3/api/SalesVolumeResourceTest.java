@@ -27,17 +27,24 @@ public class SalesVolumeResourceTest extends JerseyTest {
 	        return new ResourceConfig(SalesvolumeResource.class).property("contextConfigLocation", "classpath:/config/applicationContext.xml");  
 	    }
 	 
-	    @Test
+	    //@Test
 	    public void monthly_sales_vol_test() {
 
 	    	Response response = target("salesvolume/monthly_sales_vol/2014").request().get(Response.class);
 	    	assertTrue(response.getStatus() == 200);
 	    }
 	    
-	    @Test
+	    //@Test
 	    public void products_sales_vol_test(){
 	  
 	    	Response response = target("salesvolume/products_sales_vol/2014").request().get(Response.class);
+	    	assertTrue(response.getStatus() == 200);
+	    }
+	    
+	    @Test
+	    public void products_sales_vol_WITH_category_test(){
+	  
+	    	Response response = target("salesvolume/products_sales_vol/2014/Ä¿ÇÇ").request().get(Response.class);
 	    	assertTrue(response.getStatus() == 200);
 	    }
 	    

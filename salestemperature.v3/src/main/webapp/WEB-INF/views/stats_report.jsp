@@ -31,7 +31,7 @@
     <link href="/salestemperature.v3/static/dist/css/sb-admin-2.css" rel="stylesheet">
 
     <!-- Morris Charts CSS -->
-    <link href="/salestemperature.v3/static/salest_dashbd/bower_components/morrisjs/morris.css" rel="stylesheet">
+    <link href="/salestemperature.v3/static/bower_components/morrisjs/morris.css" rel="stylesheet">
 
     <!-- Custom Fonts -->
     <link href="/salestemperature.v3/static/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
@@ -47,13 +47,12 @@
 		
         var funcLoadDescSalesVolumeData;
         var funcLoadMonthlySalesVolumeData;
-        var funcLoadProductCategorySalesVolumeData;
+        var funcLoadCategoriesSalesVolumeData;
+        var funcLoadProductsSalesVolumeData;
         
         var funcSelectCategoryItem;
 		var funcSelectDayOfWeekItem;
-        
-        var funcDefaultSelectCategoryItem;
-        
+
 		var reverseArr;
 		var selectDayOfWeekItem;
 		var sortObjectByKey;
@@ -94,7 +93,7 @@
                     var new_content = $("<div class='morris-hover-row-label'><span id='date'></span></div><div class='morris-hover-point' style='color: #0b62a4'><span id='num_of_product'></span></div><div class='morris-hover-point' style='color: #7A92A3'><span id='total_amount'></span></div>");
                     $('#date', new_content).html(row.date);
                     $('#num_of_product',new_content).html(row.totalSalesCount + " items");
-                    $('#total_amount',new_content).html(row.totalSalesAmount + " KRW");
+                    $('#total_amount',new_content).html(row.totalSalesAmount + " KRW(ten thounsand)");
                     return (new_content);
                 },
                 
@@ -166,73 +165,14 @@
 					}	
 				});
             }
-            
-                                     
-            funcDefaultSelectCategoryItem = function(element, year){ 
-				
-				var selectedItem = $(element).text();
-				$("#menu_cate_items_caption").text(selectedItem);
-				
-				var jsonParams = "{\"category\":\"" + selectedItem + "\"}";
-				
-				$.ajax({
-					type: "POST",
-					data: jsonParams,
-					contentType: 'application/json; charset=UTF-8',
-					dataType: "json",
-					url: "/salest_dashbd/api/monthly_product_cate_detail_sales_amount/" + year,
-                    beforeSend : function(){
-                        $('#myModal').modal('show');
-                    },
-					success: function (response) {
-						var jsonObj = $.parseJSON(response);
-						var dataArr = jsonObj.total_amount;
-						var dateKeyArr = [];	
-						
-						$.each(dataArr, function(key, value){
-							for (var key in value) {
-								if(key!='year_month'){
-									dateKeyArr.push(key);
-								}
-							}
-						});
-						
-						menuCategoryItems = dateKeyArr.filter(function(item,idx,arr){
-						    return idx==arr.indexOf(item);
-						});
-										
-						// clear before items
-						dataArr_PerProductCateSalesVolume.length = 0;
-						keyArr_PerProductCateSalesVolume.length = 0;
-						
-						dataArr_PerProductCateSalesVolume = $.extend(true, [], dataArr);
-						keyArr_PerProductCateSalesVolume = $.extend(true, [], menuCategoryItems);	
-						
-						area_chart.options.labels = keyArr_PerProductCateSalesVolume;
-						area_chart.options.ykeys = keyArr_PerProductCateSalesVolume;
-						area_chart.setData(dataArr_PerProductCateSalesVolume);
-						
-						area_chart.redraw();
-                        $('#myModal').modal('hide');
-					},
-	        		error: function () {
-                        $('#myModal').modal('hide');
-						alert("Error loading data! Please try again.");
-					}
-				});
-			}
-            
-            funcSelectCategoryItem = function(element){            
-                funcDefaultSelectCategoryItem(element, curSelectYear);
-            }
-                        
-			funcLoadMonthlySalesVolumeData = function(year){
+
+			funcLoadMonthlySalesVolumeData = function(){
                 
                 $.ajax({
                     type: "GET",
                     dataType: "json",
                     contentType: "application/json",
-                    url: "/salestemperature.v3/api/salesvolume/monthly_sales_vol/" + year,
+                    url: "/salestemperature.v3/api/salesvolume/monthly_sales_vol/" + curSelectYear,
                     beforeSend : function(){
                         $('#myModal').modal('show');
                     },
@@ -253,13 +193,13 @@
                 });
             }
             
-			funcLoadDescSalesVolumeData = function(year){
+			funcLoadDescSalesVolumeData = function(){
                 
                 $.ajax({
                     type: "GET",
                     dataType: "json",
                     contentType: "application/json",
-                    url: "/salestemperature.v3/api/salesvolume/annual_sales_vol_sum/" + year,
+                    url: "/salestemperature.v3/api/salesvolume/annual_sales_vol_sum/" + curSelectYear,
                     beforeSend : function(){
                         $('#myModal').modal('show');
                     },
@@ -282,14 +222,33 @@
                 });
             }
             
-			///////////////////////////////////////////////////////////////////////////////////////////////
-            funcLoadProductCategorySalesVolumeData = function(year){
+			
+
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // [STRAT] - SalesVolume By Categories/Products
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			
+			funcSelectCategoryItem = function(element){
+				funcLoadProductsSalesVolumeData(element, curSelectYear);
+            }
+            
+			funcBindingCategoryNameItems = function(categoryItemsArr){
+				
+	            $("#menu_cate_items_list").children().remove();
+	            $.each(categoryItemsArr, function(key, value){
+	                $("#menu_cate_items_list").append("<li><a href='#' onclick='funcLoadProductsSalesVolumeData(this);return false;'>" + value + "</a></li>");
+	            });
+	            $("#menu_cate_items_list").append("<li><a href='#' onclick='funcLoadCategoriesSalesVolumeData();return false;'>All</a></li>");
+			
+			}
+
+            funcLoadCategoriesSalesVolumeData = function(){
                 
                 $.ajax({
                     type: "GET",
                     dataType: "json",
                     contentType: "application/json",
-                    url: "/salestemperature.v3/api/salesvolume/products_sales_vol/" + year,
+                    url: "/salestemperature.v3/api/salesvolume/products_sales_vol/" + curSelectYear,
                     beforeSend : function(){
                         $('#myModal').modal('show');
                     },
@@ -313,7 +272,9 @@
                         dataArr_PerProductCateSalesVolume.length = 0;
                         keyArr_PerProductCateSalesVolume.length = 0;
                         
-                        keyArr_PerProductCateSalesVolume = $.extend(true, [], Object.keys(annualSalesAmount[0]));	
+                        keyArr_PerProductCateSalesVolume = $.extend(true, [], Object.keys(annualSalesAmount[0]));
+                        keyArr_PerProductCateSalesVolume = keyArr_PerProductCateSalesVolume.slice(1,keyArr_PerProductCateSalesVolume.length)	// first 'date' item should be removed
+
                         dataArr_PerProductCateSalesVolume = $.extend(true, [], annualSalesAmount);
 
                         area_chart.options.labels = keyArr_PerProductCateSalesVolume;
@@ -321,14 +282,7 @@
                         area_chart.setData(dataArr_PerProductCateSalesVolume);
                         area_chart.redraw();
                         
-                        $("#menu_cate_items_list").children().remove();
-                        
-                        /*
-                        $.each(menuCategoryItems, function(key, value){
-                            $("#menu_cate_items_list").append("<li><a href='#' onclick='funcSelectCategoryItem(this);return false;'>" + value + "</a></li>");
-                        });
-                        $("#menu_cate_items_list").append("<li><a href='#' onclick='funcSelectCategoryItem(this);return false;'>All</a></li>");
-           				*/
+ 						funcBindingCategoryNameItems(keyArr_PerProductCateSalesVolume);
            				
                         $('#myModal').modal('hide');
                     },
@@ -338,7 +292,63 @@
                     }	
                 });
             }	
-			
+
+            funcLoadProductsSalesVolumeData = function(element){
+                
+            	var selCategoryName = $(element).text();
+				$("#menu_cate_items_caption").text(selCategoryName);
+				
+                $.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    contentType: "application/json",
+                    url: "/salestemperature.v3/api/salesvolume/products_sales_vol/" + curSelectYear + "/" + selCategoryName,
+                    beforeSend : function(){
+                        $('#myModal').modal('show');
+                    },
+                    success: function (response) {
+      
+       					var annualSalesAmount = [];
+       			
+                    	for(var monthlySalesVolItems in response){
+                    		var monthlySalesAmountObj = new Object();
+                    		monthlySalesAmountObj.date = response[monthlySalesVolItems].date;
+                    		
+                    		var itemList = response[monthlySalesVolItems].itemList;
+                    		for(var idx in itemList){
+                    			monthlySalesAmountObj[itemList[idx].itemName] = itemList[idx].totalSalesAmount;
+                    		}
+                    		
+                    		annualSalesAmount.push(monthlySalesAmountObj)
+                    	}
+                    	
+                        // clear before items
+                        dataArr_PerProductCateSalesVolume.length = 0;
+                        keyArr_PerProductCateSalesVolume.length = 0;
+                        
+                        keyArr_PerProductCateSalesVolume = $.extend(true, [], Object.keys(annualSalesAmount[0]));
+                        keyArr_PerProductCateSalesVolume = keyArr_PerProductCateSalesVolume.slice(1,keyArr_PerProductCateSalesVolume.length)	// first 'date' item should be removed
+
+                        dataArr_PerProductCateSalesVolume = $.extend(true, [], annualSalesAmount);
+
+                        area_chart.options.labels = keyArr_PerProductCateSalesVolume;
+                        area_chart.options.ykeys = keyArr_PerProductCateSalesVolume;
+                        area_chart.setData(dataArr_PerProductCateSalesVolume);
+                        area_chart.redraw();
+                        
+                        $('#myModal').modal('hide');
+                    },
+                    error: function () {
+                        $('#myModal').modal('hide');
+                        alert("Error loading data! Please try again.");
+                    }	
+                });
+            }	
+            
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // [END] - SalesVolume By Categories/Products
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
 			
     		funcQueryReportPerYear = function(year){
     			
@@ -348,19 +358,21 @@
     			
 				$("#selected_year_caption").html(year_combo_caption);
 				
+    			/*
 				funcLoadDescSalesVolumeData(curSelectYear);
 				funcLoadMonthlySalesVolumeData(curSelectYear);
 				funcLoadProductCategorySalesVolumeData(curSelectYear);
 				funcSelectDayOfWeekItem(null);
+				*/
+				
+				funcLoadDescSalesVolumeData();
+	        	funcLoadMonthlySalesVolumeData();
+	        	funcLoadCategoriesSalesVolumeData();
     		}
 		})
             
         $(window).load(function(){
-        	//funcQueryReportPerYear('2015');
-        	
-        	funcLoadDescSalesVolumeData("2014");
-        	funcLoadMonthlySalesVolumeData("2014");
-        	funcLoadProductCategorySalesVolumeData("2014");
+        	funcQueryReportPerYear('2015');
         })
 		
 	</script>
@@ -505,7 +517,7 @@
                                     <div class="huge">
                                     	<span id="total_sales_amount"></span>
                                     </div>
-                                    <div>KRW</div>
+                                    <div>KRW(ten thounsand)</div>
                                 </div>
                             </div>
                         </div>
@@ -553,7 +565,7 @@
                                     <div class="huge">
                                     	<span id="avrg_sales_amount"></span>
                                     </div>
-                                    <div>KRW</div>
+                                    <div>KRW(ten thounsand)</div>
                                 </div>
                             </div>
                         </div>

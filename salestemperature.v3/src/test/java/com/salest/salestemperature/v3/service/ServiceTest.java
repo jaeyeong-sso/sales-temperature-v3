@@ -35,29 +35,41 @@ public class ServiceTest {
 		assertNotNull(analyzeProductSalesVolumeService);
 	}
 
-	@Test
+	//@Test
 	public void annualSalesVolumeTest(){
 		AnnualSalesVolumeSummary annualSalesVolumeSummary = analyzeProductSalesVolumeService.getAnnualSalesVolume("2014");
 	}
 	
 	
 	//@Test
-	public void salesContributionPerMenuTest(){
+	public void getMonthlySalesVolumeByCategories(){
 		
 		List<SalesVolume> listResult;
 		
 		listResult = analyzeProductSalesVolumeService.getMonthlySalesVolumeByCategories("2014");
 		
-		for(SalesVolume salesVolumeItem : listResult){
-			System.out.println(salesVolumeItem.toString());
-		}
-		/*
-		listResult = analyzeProductSalesVolumeService.getMonthlySalesVolumeByProducts("2014","¶ó¶¼");
+		System.out.println("\r\n[START] - getMonthlySalesVolumeByCategories - [END]\r\n");
 		
 		for(SalesVolume salesVolumeItem : listResult){
 			System.out.println(salesVolumeItem.toString());
 		}
+
+		assertTrue(listResult.size() > 0);
+	}
+	
+	//@Test
+	public void getMonthlySalesVolumeByProductsTest(){
+		
+		List<SalesVolume> listResult = analyzeProductSalesVolumeService.getMonthlySalesVolumeByProducts("2014","¶ó¶¼");
+		
+		System.out.println("\r\n[START] - getMonthlySalesVolumeByProductsTest - [END]\r\n");
+		
+		/*
+		for(SalesVolume salesVolumeItem : listResult){
+			System.out.println(salesVolumeItem.toString());
+		}
 		*/
+		
 		assertTrue(listResult.size() > 0);
 	}
 	

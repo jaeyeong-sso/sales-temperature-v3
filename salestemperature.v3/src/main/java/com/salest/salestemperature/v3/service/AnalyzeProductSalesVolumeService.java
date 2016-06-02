@@ -56,6 +56,41 @@ public class AnalyzeProductSalesVolumeService {
 		return salesVolumeDao.listingMonthlySalesVolume(queryYear);
 	}
 
+	
+	private List<SalesVolume> fillNonExistMonthSalesVolumeItems(String queryYear, List<SalesVolume> salesVolumes, List<String> itemKeys){
+		
+		for(int monthIdx=1; monthIdx<=12; monthIdx++){
+			
+			final String dateKey = String.format("%s-%02d", queryYear,monthIdx);
+			
+			SalesVolume findObject = (SalesVolume)CollectionUtils.find(salesVolumes, new org.apache.commons.collections.Predicate() {
+		        public boolean evaluate(Object salesVolume) {
+		            return ((SalesVolume)salesVolume).getDate().equals(dateKey);
+		        }
+		    });
+			
+			if(findObject==null){
+				for(String itemName : itemKeys){
+					salesVolumes.add(
+							new SalesVolume.SalesVolumeBuilder()
+							.withDate(dateKey)
+							.withOptItemName(itemName)
+							.withTotalSalesCount(0)
+							.withTotalSalesAmount(0L).build());
+				}
+			}
+		}
+		
+		Collections.sort(salesVolumes, new Comparator<SalesVolume>() {
+			public int compare(SalesVolume first, SalesVolume second) {
+				return first.getDate().compareTo(second.getDate());
+			}
+		});
+		
+		return salesVolumes;
+	}
+	
+	
 	public List<SalesVolume> getMonthlySalesVolumeByCategories(String queryYear){
 		
 		List<Category> productCategories = categoryDao.listingAllProductCategory();
@@ -66,6 +101,9 @@ public class AnalyzeProductSalesVolumeService {
 			categoryNames.add(category.getName());
 		}
 
+		return fillNonExistMonthSalesVolumeItems(queryYear, categorySalesVolumes, categoryNames);
+		
+		/*
 		for(int monthIdx=1; monthIdx<=12; monthIdx++){
 			
 			final String dateKey = String.format("%s-%02d", queryYear,monthIdx);
@@ -95,6 +133,8 @@ public class AnalyzeProductSalesVolumeService {
 		});
 		
 		return categorySalesVolumes;
+		 */
+		
 	}
 	
 	public List<SalesVolume> getMonthlySalesVolumeByProducts(String queryYear, final String categoryName){
@@ -104,14 +144,14 @@ public class AnalyzeProductSalesVolumeService {
 
 		Set<String> productNameKeySet = category.getProductsMap().keySet();
 				
-		List<SalesVolume> finalResultList = new ArrayList<SalesVolume>(); 
+		List<SalesVolume> productsSalesVolumes = new ArrayList<SalesVolume>(); 
 			
 		Map<String,Integer> etcItemsToatalCountMap = new HashMap<String,Integer>();
 		Map<String,Long> etcItemsToatalAmountMap = new HashMap<String,Long>();
 			
 		for(SalesVolume itemSalesVolume : listResult){
 				if( productNameKeySet.contains(itemSalesVolume.getOptItemName())){
-					finalResultList.add(itemSalesVolume);
+					productsSalesVolumes.add(itemSalesVolume);
 				} else {
 					String dateKey = itemSalesVolume.getDate();
 					if(etcItemsToatalCountMap.containsKey(dateKey)){
@@ -125,28 +165,25 @@ public class AnalyzeProductSalesVolumeService {
 		}
 			
 		for(String key : etcItemsToatalCountMap.keySet()){
-				finalResultList.add(new SalesVolume.SalesVolumeBuilder()
+			productsSalesVolumes.add(new SalesVolume.SalesVolumeBuilder()
 						.withDate(key)
 						.withOptItemName("ETC.")
 						.withTotalSalesCount(etcItemsToatalCountMap.get(key))
 						.withTotalSalesAmount(etcItemsToatalAmountMap.get(key))
 						.build());
 		}
-			
 
-		Collections.sort(finalResultList, new Comparator<SalesVolume>() {
+		Collections.sort(productsSalesVolumes, new Comparator<SalesVolume>() {
 			public int compare(SalesVolume first, SalesVolume second) {
 				return first.getDate().compareTo(second.getDate());
 			}
 		});
-
-		/*
-		for(SalesVolume salesVolumItem : finalResultList){
-			System.out.println(salesVolumItem.toString());
-		}
-		*/
 		
-		return finalResultList;
+		List<String> productNamesList = new ArrayList<String>();
+		productNamesList.addAll(productNameKeySet);
+		productNamesList.add("ETC.");
+
+		return fillNonExistMonthSalesVolumeItems(queryYear, productsSalesVolumes, productNamesList);
 	}
 
 }

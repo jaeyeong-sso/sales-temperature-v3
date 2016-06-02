@@ -116,8 +116,25 @@ public class SalesvolumeResource {
 		
 		List<SalesVolume> itemSalesVolumes = analyzeProductSalesVolumeService.getMonthlySalesVolumeByProducts(queryYear, queryCategory);
 		
+		List<SalesVolumeResponse> responseItemList = new ArrayList<SalesVolumeResponse>();
+
+		for(int monthIdx=1; monthIdx<=12; monthIdx++){
+			String dateKey = String.format("%s-%02d", queryYear,monthIdx);
+			
+			SalesVolumeResponse mothlySalesVolume = new SalesVolumeResponse(dateKey);
+			
+			for(SalesVolume itemSalseVolume : itemSalesVolumes){
+				if(itemSalseVolume.getDate().equals(dateKey)){
+					mothlySalesVolume.addItemList(
+							new SalesVolumeResponse.ItemDetail(itemSalseVolume.getOptItemName(), itemSalseVolume.getTotalSalesCount(), itemSalseVolume.getTotalSalesAmount()));
+				}
+			}
+			
+			responseItemList.add(mothlySalesVolume);
+		}
+		
 		if(itemSalesVolumes!=null){
-			return Response.status(200).entity(itemSalesVolumes).build();
+			return Response.status(200).entity(responseItemList).build();
 		} else {
 			return Response.status(500).build();
 		}
