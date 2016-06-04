@@ -21,7 +21,7 @@ import com.salest.salestemperature.v3.model.Product;
 import com.salest.salestemperature.v3.model.SalesVolume;
 
 
-public class AnalyzeProductSalesVolumeService {
+public class AnalyzeSalesVolumeService {
 	
 	private CategoryDao categoryDao;
 	private SalesVolumeDao salesVolumeDao;

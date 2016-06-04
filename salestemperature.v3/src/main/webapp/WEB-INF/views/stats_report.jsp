@@ -498,7 +498,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{% url 'salest_dashbd.views.index' %}">Sales Temperature 3.0</a>
+                <a class="navbar-brand" href="/salestemperature.v3/web/stats_report">Sales Temperature 3.0</a>
             </div>
             <!-- /.navbar-header -->
 
@@ -506,10 +506,10 @@
                 <div class="sidebar-nav navbar-collapse">
                     <ul class="nav" id="side-menu">
                         <li>
-                            <a href="{% url 'salest_dashbd.views.stats_report' %}"><i class="fa fa-calendar fa-fw"></i> Annual stats report</a>
+                            <a href="/salestemperature.v3/web/stats_report"><i class="fa fa-calendar fa-fw"></i> Annual Stats Report</a>
                         </li>
                         <li>
-                            <a href="{% url 'salest_dashbd.views.realtime_report' %}"><i class="fa fa-bolt fa-fw"></i> Realtime sales timebase comparison</a>
+                            <a href="/salestemperature.v3/web/realtime_report"><i class="fa fa-bolt fa-fw"></i> Realtime Sales Analysis</a>
                         </li>
                         <li>
                         	<div class="panel panel-primary" style='width: 80%; object-fit: contain; margin:auto; margin-top:20px; margin-bottom:20px;'>
@@ -547,7 +547,7 @@
                     <h1 class="page-header">
                     	<table width="100%">
                     		<tr>
-                    			<td>Annual stats report</td>
+                    			<td>Annual Stats Report</td>
                     			<td align="right"><small></small></td>
 	                    		<td align="right">
 									<div class="btn-group">

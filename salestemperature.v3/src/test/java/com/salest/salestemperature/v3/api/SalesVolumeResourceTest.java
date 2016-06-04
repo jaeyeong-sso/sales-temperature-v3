@@ -55,10 +55,22 @@ public class SalesVolumeResourceTest extends JerseyTest {
 	    	assertTrue(response.getStatus() == 200);
 	    }
 	    
-	    @Test
+	    //@Test
 	    public void dayofweek_sales_vol_test(){
 	  
 	    	Response response = target("salesvolume/dayofweek_sales_vol/2014/09").request().get(Response.class);
+	    	assertTrue(response.getStatus() == 200);
+	    }
+	    
+	    @Test
+	    public void get_products_category_test(){
+	    	Response response = target("salesvolume/get_products_category").request().get(Response.class);
+	    	assertTrue(response.getStatus() == 200);
+	    }
+	    
+	    @Test
+	    public void get_products_items_test(){
+	    	Response response = target("salesvolume/get_products_items/Ä¿ÇÇ").request().get(Response.class);
 	    	assertTrue(response.getStatus() == 200);
 	    }
 	    

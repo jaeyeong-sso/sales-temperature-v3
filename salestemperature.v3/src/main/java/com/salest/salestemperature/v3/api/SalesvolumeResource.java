@@ -16,18 +16,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.salest.salestemperature.v3.api.model.AnnualSalesVolumeSummary;
+import com.salest.salestemperature.v3.api.model.ProductDetailResponse;
 import com.salest.salestemperature.v3.api.model.SalesVolumeResponse;
 import com.salest.salestemperature.v3.dao.SalesVolumeDao;
 import com.salest.salestemperature.v3.model.Category;
+import com.salest.salestemperature.v3.model.Product;
 import com.salest.salestemperature.v3.model.SalesVolume;
-import com.salest.salestemperature.v3.service.AnalyzeProductSalesVolumeService;
+import com.salest.salestemperature.v3.service.AnalyzeSalesVolumeService;
+import com.salest.salestemperature.v3.service.ProductsInfoService;
 
 @Component
 @Path("/salesvolume")
 public class SalesvolumeResource {
 
 	@Autowired
-	AnalyzeProductSalesVolumeService analyzeProductSalesVolumeService;
+	AnalyzeSalesVolumeService analyzeSalesVolumeService;
+	
+	@Autowired
+	ProductsInfoService productsInfoService;
 	
 	
 	@GET
@@ -35,7 +41,7 @@ public class SalesvolumeResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAnnualSalesVolumeSummary(@PathParam("queryYear") String queryYear) {
 		
-		AnnualSalesVolumeSummary annualSalesVolume = analyzeProductSalesVolumeService.getAnnualSalesVolume(queryYear);
+		AnnualSalesVolumeSummary annualSalesVolume = analyzeSalesVolumeService.getAnnualSalesVolume(queryYear);
 		
 		if(annualSalesVolume!=null){
 			return Response.status(200).entity(annualSalesVolume).build();
@@ -50,7 +56,7 @@ public class SalesvolumeResource {
 	public Response getMontlySalesVolume(@PathParam("queryYear") String queryYear) {
 		
 		List<SalesVolume> fullYearSalesVolumes = new ArrayList<SalesVolume>();
-		List<SalesVolume> monthlySalesVolumes = analyzeProductSalesVolumeService.listingMonthlySalesVolume(queryYear);
+		List<SalesVolume> monthlySalesVolumes = analyzeSalesVolumeService.listingMonthlySalesVolume(queryYear);
 		
 		if(monthlySalesVolumes!=null){
 			
@@ -83,7 +89,7 @@ public class SalesvolumeResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getCategoriesSalesVolume(@PathParam("queryYear") String queryYear) {
 		
-		List<SalesVolume> itemSalesVolumes = analyzeProductSalesVolumeService.getMonthlySalesVolumeByCategories(queryYear);
+		List<SalesVolume> itemSalesVolumes = analyzeSalesVolumeService.getMonthlySalesVolumeByCategories(queryYear);
 
 		List<SalesVolumeResponse> responseItemList = new ArrayList<SalesVolumeResponse>();
 
@@ -114,7 +120,7 @@ public class SalesvolumeResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getProductsSalesVolume(@PathParam("queryYear") String queryYear, @PathParam("queryCategory") String queryCategory) {
 		
-		List<SalesVolume> itemSalesVolumes = analyzeProductSalesVolumeService.getMonthlySalesVolumeByProducts(queryYear, queryCategory);
+		List<SalesVolume> itemSalesVolumes = analyzeSalesVolumeService.getMonthlySalesVolumeByProducts(queryYear, queryCategory);
 		
 		List<SalesVolumeResponse> responseItemList = new ArrayList<SalesVolumeResponse>();
 
@@ -147,7 +153,7 @@ public class SalesvolumeResource {
 	public Response getTimeBaseSalesVolume(@PathParam("queryYear") String queryYear, @PathParam("queryMonth") String queryMonth) {
 		
 		String dateYearMonthKey = String.format("%s-%s", queryYear,queryMonth);
-		List<SalesVolume> itemSalesVolumes = analyzeProductSalesVolumeService.getTimebaseSalesVolumeOfMonth(dateYearMonthKey);
+		List<SalesVolume> itemSalesVolumes = analyzeSalesVolumeService.getTimebaseSalesVolumeOfMonth(dateYearMonthKey);
 		
 		SalesVolumeResponse responseItems = new SalesVolumeResponse(dateYearMonthKey);
 		
@@ -169,7 +175,7 @@ public class SalesvolumeResource {
 	public Response getDayOfWeekSalesVolume(@PathParam("queryYear") String queryYear, @PathParam("queryMonth") String queryMonth) {
 		
 		String dateYearMonthKey = String.format("%s-%s", queryYear,queryMonth);
-		List<SalesVolume> itemSalesVolumes = analyzeProductSalesVolumeService.getDayOfWeekSalesVolumeOfMonth(dateYearMonthKey);
+		List<SalesVolume> itemSalesVolumes = analyzeSalesVolumeService.getDayOfWeekSalesVolumeOfMonth(dateYearMonthKey);
 		
 		SalesVolumeResponse responseItems = new SalesVolumeResponse(dateYearMonthKey);
 		
@@ -179,6 +185,39 @@ public class SalesvolumeResource {
 		}
 
 		if(itemSalesVolumes!=null){
+			return Response.status(200).entity(responseItems).build();
+		} else {
+			return Response.status(500).build();
+		}
+	}
+	
+	@GET
+	@Path("/get_products_category")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getProductCategoriesNames() {
+		
+		List<String> responseItems = productsInfoService.getProductCategoriesInfo();
+
+		if(responseItems.size()>0){
+			return Response.status(200).entity(responseItems).build();
+		} else {
+			return Response.status(500).build();
+		}
+	}
+	
+	@GET
+	@Path("/get_products_items/{categoryName}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getPopularProductItemsNames(@PathParam("categoryName") String categoryName) {
+		
+		List<Product> products = productsInfoService.getProductItemsDetails(categoryName);
+		List<ProductDetailResponse> responseItems = new ArrayList<ProductDetailResponse>();
+		
+		for(Product product : products){
+			responseItems.add(new ProductDetailResponse(product.getId(), product.getName(),product.getPrice()));
+		}
+		
+		if(responseItems.size()>0){
 			return Response.status(200).entity(responseItems).build();
 		} else {
 			return Response.status(500).build();
