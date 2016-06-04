@@ -50,6 +50,30 @@ public class SalesVolumeDao {
 		}
 	};
 	
+	private RowMapper<SalesVolume> salesVolumeListMapperByTimebaseOfMonth = new RowMapper<SalesVolume>(){
+		public SalesVolume mapRow(ResultSet rs,int rowNumber) throws SQLException{
+			return new SalesVolume.SalesVolumeBuilder()
+					.withDate(rs.getString("tr_date"))
+					.withOptItemName(rs.getString("tr_time"))
+					.withTotalSalesCount(rs.getInt("total_count"))
+					.withTotalSalesAmount(rs.getLong("total_amount"))
+					.build();
+		}
+	};
+	
+	private RowMapper<SalesVolume> salesVolumeListMapperByDayOfWeekOfMonth = new RowMapper<SalesVolume>(){
+		public SalesVolume mapRow(ResultSet rs,int rowNumber) throws SQLException{
+			return new SalesVolume.SalesVolumeBuilder()
+					.withDate(rs.getString("tr_year_month"))
+					.withOptItemName(rs.getString("day_of_week"))
+					.withTotalSalesCount(rs.getInt("avrg_total_count"))
+					.withTotalSalesAmount(rs.getLong("avrg_total_amount"))
+					.build();
+		}
+	};
+	
+	
+	
 	public List<SalesVolume> listingMonthlySalesVolume(String queryYear){
 		
 		String queryStr = "SELECT tr_date, SUM(num_of_product) AS num_of_product, (SUM(sales_amount)/10000) AS total_amount " +
@@ -104,7 +128,26 @@ public class SalesVolumeDao {
 		        "GROUP BY tr_date,cate_name,product_code,product_name " + 
 		        "ORDER BY tr_date,cate_name,product_code,product_name ASC";
 						    
-				
 		return this.jdbcTemplate.query(queryStr, salesVolumeListMapperWithProductOptItemName);
+	}
+	
+	public List<SalesVolume> listingTimebaseSalesVolumeOfMonth(String queryYearMonth){
+		
+		String queryStr =
+			"SELECT tr_date, tr_time, SUM(num_of_product) as total_count, SUM(sales_amount) as total_amount FROM (" +
+				"SELECT SUBSTR(date_receipt_num,1,7) AS tr_date, SUBSTR(tr_time,1,2) AS tr_time, num_of_product, sales_amount FROM ext_tr_receipt WHERE SUBSTR(date_receipt_num,1,7) =" + "'" + queryYearMonth + "'" +
+			") view_tr_timebase_of_month GROUP BY view_tr_timebase_of_month.tr_time, tr_date ORDER BY tr_time ASC";
+
+		return this.jdbcTemplate.query(queryStr, salesVolumeListMapperByTimebaseOfMonth);
+	}
+	
+	public List<SalesVolume> listingDayOfWeekSalesVolumeOfMonth(String queryYearMonth){
+		
+		String queryStr =
+			"SELECT day_of_week, tr_year_month, cast((SUM(num_of_product)/COUNT(DISTINCT tr_date)) as INTEGER) AS avrg_total_count, cast((SUM(sales_amount)/COUNT(DISTINCT tr_date)) as BIGINT) AS avrg_total_amount FROM (" +
+				"SELECT SUBSTR(date_receipt_num,1,10) AS tr_date, SUBSTR(date_receipt_num,1,7) AS tr_year_month, DAYOFWEEK(date_receipt_num) AS day_of_week, num_of_product, sales_amount FROM ext_tr_receipt WHERE SUBSTR(date_receipt_num,1,7) =" + "'" + queryYearMonth + "'" +
+			") view_tr_dayofweek_of_month GROUP BY view_tr_dayofweek_of_month.day_of_week, tr_year_month ORDER BY day_of_week ASC";
+
+		return this.jdbcTemplate.query(queryStr, salesVolumeListMapperByDayOfWeekOfMonth);
 	}
 }

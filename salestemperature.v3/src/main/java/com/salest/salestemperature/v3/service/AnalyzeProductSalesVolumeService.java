@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,7 +18,6 @@ import com.salest.salestemperature.v3.dao.CategoryDao;
 import com.salest.salestemperature.v3.dao.SalesVolumeDao;
 import com.salest.salestemperature.v3.model.Category;
 import com.salest.salestemperature.v3.model.Product;
-import com.salest.salestemperature.v3.model.ProductSalesVolume;
 import com.salest.salestemperature.v3.model.SalesVolume;
 
 
@@ -24,6 +25,20 @@ public class AnalyzeProductSalesVolumeService {
 	
 	private CategoryDao categoryDao;
 	private SalesVolumeDao salesVolumeDao;
+	
+	private Map<String,String> weekOfDayMap;
+	
+	@PostConstruct
+	public void PostBeanCreated(){
+		weekOfDayMap = new HashMap<String,String>();
+		weekOfDayMap.put("1","Sun");
+		weekOfDayMap.put("2","Mon");
+		weekOfDayMap.put("3","Tue");
+		weekOfDayMap.put("4","Wed");
+		weekOfDayMap.put("5","Thu");
+		weekOfDayMap.put("6","Fri");
+		weekOfDayMap.put("7","Sat");
+	}
 	
 	public void setCategoryDao(CategoryDao categoryDao){
 		this.categoryDao = categoryDao;
@@ -102,39 +117,6 @@ public class AnalyzeProductSalesVolumeService {
 		}
 
 		return fillNonExistMonthSalesVolumeItems(queryYear, categorySalesVolumes, categoryNames);
-		
-		/*
-		for(int monthIdx=1; monthIdx<=12; monthIdx++){
-			
-			final String dateKey = String.format("%s-%02d", queryYear,monthIdx);
-			
-			SalesVolume findObject = (SalesVolume)CollectionUtils.find(categorySalesVolumes, new org.apache.commons.collections.Predicate() {
-		        public boolean evaluate(Object categorySalesVolume) {
-		            return ((SalesVolume)categorySalesVolume).getDate().equals(dateKey);
-		        }
-		    });
-			
-			if(findObject==null){
-				for(String categoryName : categoryNames){
-					categorySalesVolumes.add(
-							new SalesVolume.SalesVolumeBuilder()
-							.withDate(dateKey)
-							.withOptItemName(categoryName)
-							.withTotalSalesCount(0)
-							.withTotalSalesAmount(0L).build());
-				}
-			}
-		}
-		
-		Collections.sort(categorySalesVolumes, new Comparator<SalesVolume>() {
-			public int compare(SalesVolume first, SalesVolume second) {
-				return first.getDate().compareTo(second.getDate());
-			}
-		});
-		
-		return categorySalesVolumes;
-		 */
-		
 	}
 	
 	public List<SalesVolume> getMonthlySalesVolumeByProducts(String queryYear, final String categoryName){
@@ -186,4 +168,36 @@ public class AnalyzeProductSalesVolumeService {
 		return fillNonExistMonthSalesVolumeItems(queryYear, productsSalesVolumes, productNamesList);
 	}
 
+	
+	public List<SalesVolume> getTimebaseSalesVolumeOfMonth(String queryYearMonth){
+		List<SalesVolume> salesVolumes = salesVolumeDao.listingTimebaseSalesVolumeOfMonth(queryYearMonth);
+		
+		SalesVolume findObject = (SalesVolume)CollectionUtils.find(salesVolumes, new org.apache.commons.collections.Predicate() {
+	        public boolean evaluate(Object salesVolume) {
+	            return ((SalesVolume)salesVolume).getOptItemName().equals("00");
+	        }
+	    });
+
+		if(findObject!=null){
+			findObject.setOptItemName("24");
+		}
+		
+		Collections.sort(salesVolumes, new Comparator<SalesVolume>() {
+			public int compare(SalesVolume first, SalesVolume second) {
+				return first.getOptItemName().compareTo(second.getOptItemName());
+			}
+		});
+		
+		return salesVolumes;
+	}
+	
+	public List<SalesVolume> getDayOfWeekSalesVolumeOfMonth(String queryYearMonth){
+		List<SalesVolume> salesVolumes = salesVolumeDao.listingDayOfWeekSalesVolumeOfMonth(queryYearMonth);
+		
+		for(SalesVolume salesVolume : salesVolumes){
+			salesVolume.setOptItemName(weekOfDayMap.get(salesVolume.getOptItemName()));
+		}
+		
+		return salesVolumes;
+	}
 }

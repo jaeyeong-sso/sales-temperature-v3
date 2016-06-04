@@ -11,7 +11,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.salest.salestemperature.v3.dao.SalesVolumeDao;
 import com.salest.salestemperature.v3.model.Category;
 import com.salest.salestemperature.v3.model.Product;
-import com.salest.salestemperature.v3.model.ProductSalesVolume;
 import com.salest.salestemperature.v3.model.SalesVolume;
 
 import java.util.ArrayList;
@@ -116,6 +115,22 @@ public class DaoTest {
 	public void listingCategoriesMonthlySalesVolumeTest(){
 		List<SalesVolume> categorySalesVolumes = salesVolumeDao.listingCategoriesMonthlySalesVolume("2014");
 		for(SalesVolume salesVolume : categorySalesVolumes){
+			System.out.println(salesVolume.toString());
+		}
+	}
+	
+	//@Test
+	public void listingTimebaseSalesVolumeOfMonth(){
+		List<SalesVolume> salesVolumes = salesVolumeDao.listingTimebaseSalesVolumeOfMonth("2014-09");
+		for(SalesVolume salesVolume : salesVolumes){
+			System.out.println(salesVolume.toString());
+		}
+	}
+	
+	//@Test
+	public void listingDayOfWeekSalesVolumeOfMonth(){
+		List<SalesVolume> salesVolumes = salesVolumeDao.listingDayOfWeekSalesVolumeOfMonth("2014-09");
+		for(SalesVolume salesVolume : salesVolumes){
 			System.out.println(salesVolume.toString());
 		}
 	}

@@ -139,4 +139,50 @@ public class SalesvolumeResource {
 			return Response.status(500).build();
 		}
 	}
+	
+	
+	@GET
+	@Path("/timebase_sales_vol/{queryYear}/{queryMonth}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getTimeBaseSalesVolume(@PathParam("queryYear") String queryYear, @PathParam("queryMonth") String queryMonth) {
+		
+		String dateYearMonthKey = String.format("%s-%s", queryYear,queryMonth);
+		List<SalesVolume> itemSalesVolumes = analyzeProductSalesVolumeService.getTimebaseSalesVolumeOfMonth(dateYearMonthKey);
+		
+		SalesVolumeResponse responseItems = new SalesVolumeResponse(dateYearMonthKey);
+		
+		for(SalesVolume salesVolume : itemSalesVolumes){
+			responseItems.addItemList(
+					new SalesVolumeResponse.ItemDetail(salesVolume.getOptItemName(), salesVolume.getTotalSalesCount(), salesVolume.getTotalSalesAmount()));
+		}
+		
+		if(itemSalesVolumes!=null){
+			return Response.status(200).entity(responseItems).build();
+		} else {
+			return Response.status(500).build();
+		}
+	}
+	
+	@GET
+	@Path("/dayofweek_sales_vol/{queryYear}/{queryMonth}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getDayOfWeekSalesVolume(@PathParam("queryYear") String queryYear, @PathParam("queryMonth") String queryMonth) {
+		
+		String dateYearMonthKey = String.format("%s-%s", queryYear,queryMonth);
+		List<SalesVolume> itemSalesVolumes = analyzeProductSalesVolumeService.getDayOfWeekSalesVolumeOfMonth(dateYearMonthKey);
+		
+		SalesVolumeResponse responseItems = new SalesVolumeResponse(dateYearMonthKey);
+		
+		for(SalesVolume salesVolume : itemSalesVolumes){
+			responseItems.addItemList(
+					new SalesVolumeResponse.ItemDetail(salesVolume.getOptItemName(), salesVolume.getTotalSalesCount(), salesVolume.getTotalSalesAmount()));
+		}
+
+		if(itemSalesVolumes!=null){
+			return Response.status(200).entity(responseItems).build();
+		} else {
+			return Response.status(500).build();
+		}
+	}
+	
 }

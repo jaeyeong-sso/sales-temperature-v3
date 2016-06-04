@@ -49,20 +49,40 @@
         var funcLoadMonthlySalesVolumeData;
         var funcLoadCategoriesSalesVolumeData;
         var funcLoadProductsSalesVolumeData;
+        var funcLoadTimeBaseSalesVolumeData;
+        var funcLoadTimeBaseSalesVolumeDataWithElement;
+        var funcLoadDayOfWeekSalesVolumeData;
+        var funcLoadDayOfWeekSalesVolumeDataWithElement;
         
-        var funcSelectCategoryItem;
-		var funcSelectDayOfWeekItem;
-
-		var reverseArr;
-		var selectDayOfWeekItem;
-		var sortObjectByKey;
-		
 		var funcQueryReportPerYear;
 		
 		var curSelectYear;
         
+		function getNumOfMonthByNameOfMonth(month_keys_dict, nameOfMonth){
+			return $.grep(month_keys_dict, function(item){ return item.nameOfMonth == nameOfMonth; });
+		}
+		
+		function getNameOfMonthByNumOfMonth(month_keys_dict, numOfMonth){
+			return $.grep(month_keys_dict, function(item){ return item.numOfMonth == numOfMonth; });
+		}
+		
 		$(document).ready(function(){
             
+			var month_keys_dict = [
+			    { nameOfMonth : "Jan.", numOfMonth : "01"},
+			    { nameOfMonth : "Feb.", numOfMonth : "02"},
+			    { nameOfMonth : "Mar.", numOfMonth : "03"},
+			    { nameOfMonth : "Apr.", numOfMonth : "04"},
+			    { nameOfMonth : "May.", numOfMonth : "05"},
+			    { nameOfMonth : "Jun.", numOfMonth : "06"},
+			    { nameOfMonth : "Jul.", numOfMonth : "07"},
+			    { nameOfMonth : "Aug.", numOfMonth : "08"},
+			    { nameOfMonth : "Sep.", numOfMonth : "09"},
+			    { nameOfMonth : "Oct.", numOfMonth : "10"},
+			    { nameOfMonth : "Nov.", numOfMonth : "11"},
+			    { nameOfMonth : "Dec.", numOfMonth : "12"}
+			];
+
 			var menuCategoryItems = [];
 			
 			var dataArr_PerProductCateSalesVolume = [];
@@ -99,73 +119,10 @@
                 
                 resize: true
             });
-        	
-            funcSelectDayOfWeekItem = function(element){
-				
-				var selectedItem;
-				var jsonParams;
-                
-				if(element==null){
-					selectedItem = 'All';
-				} else {
-					selectedItem = $(element).text();
-					$("#timebase_sales_amount_items_caption").text(selectedItem);	
-				}
-				
-				jsonParams = "{\"dayOfWeek\":\"" + selectedItem + "\"}";
-				
-				$.ajax({
-					type: "POST",
-					data: jsonParams,
-					contentType: 'application/json',
-					dataType: "json",
-					url: "/salest_dashbd/api/timebase_sales_amount/" + curSelectYear,
-                    beforeSend : function(){
-                        $('#myModal').modal('show');
-                    },
-					success: function (response) {
-						var jsonObj = $.parseJSON(response);
-                        $("#list_timebase_sales_amount").children().remove();
-                        
-                        var keyTimeRange;
-                        var rangeStartTime;
-                        var rangeEndTime;
-                        
-                        $.each(jsonObj.total_amount, function(key, value){
-                            
-                            rangeStartTime = parseInt(key);
-							rangeEndTime = rangeStartTime + 1;
-                            
-                            if(rangeStartTime < 10){
-                                rangeStartTime = "0" + rangeStartTime;
-                            }                        
-                            if(rangeEndTime < 10){
-                                rangeEndTime = "0" + rangeEndTime;
-                            }
-                            
-							keyTimeRange = rangeStartTime + ":00" + "~"  + rangeEndTime + ":00";
-							
-                            var spanId = "#item_" + rangeStartTime;
-                            
-                            var strHtmlItem = '<a href="#" class="list-group-item">'+
-								keyTimeRange +
-								'&nbsp;&nbsp;<span id="item_'+ rangeStartTime +'" class="rounded">&nbsp;</span>' +
-								'<span class="pull-right text-muted small">' +
-								'<i class="fa fa-krw fa-fw"></i><em>' + value + '</em>' +
-								'</span></a>';
-                            
-                            $("#list_timebase_sales_amount").append(strHtmlItem);
-                            $(spanId).css("width", Math.round(parseInt(value)/350) +"px");
-                        });
-                        $('#myModal').modal('hide');
-                    },
-                    error: function () {
-                        $('#myModal').modal('hide');
-						alert("Error loading data! Please try again.");
-					}	
-				});
-            }
-
+  
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // [STRAT] - Monthly Aggregated SalesVolume
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			funcLoadMonthlySalesVolumeData = function(){
                 
                 $.ajax({
@@ -192,7 +149,13 @@
                     }	
                 });
             }
-            
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // [END] - Monthly Aggregated SalesVolume
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // [STRAT] - Annual Summary of Sales Volume
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 			funcLoadDescSalesVolumeData = function(){
                 
                 $.ajax({
@@ -221,8 +184,9 @@
                     }
                 });
             }
-            
-			
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // [END] - Annual Summary of Sales Volume
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // [STRAT] - SalesVolume By Categories/Products
@@ -350,7 +314,123 @@
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 			
-    		funcQueryReportPerYear = function(year){
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // [START] - SalesVolume By TimeBase
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+			funcLoadTimeBaseSalesVolumeDataWithElement = function(element){
+				if(element!=null){
+					funcLoadTimeBaseSalesVolumeData(curSelectYear, $(element).text());
+				}
+			}
+			
+			funcLoadTimeBaseSalesVolumeData = function(year,monthName){
+				
+				 var numOfMonthObj = getNumOfMonthByNameOfMonth(month_keys_dict, monthName);
+				 var numofMonthValue = numOfMonthObj[0].numOfMonth;
+				
+				 $.ajax({
+	                    type: "GET",
+	                    dataType: "json",
+	                    contentType: "application/json",
+	                    url: "/salestemperature.v3/api/salesvolume/timebase_sales_vol/" + year + "/" + numofMonthValue,
+	                    beforeSend : function(){
+	                        $('#myModal').modal('show');
+	                    },
+	                    success: function (response) {
+	      
+	                    	$("#timebase_sales_amount_items_caption").text(monthName);	
+	                    	
+	                    	$("#list_timebase_sales_amount").children().remove();
+	                        
+	                    	for(var idxItemList in response.itemList){
+	                    		
+	                    		var timeSlotKey = response.itemList[idxItemList].itemName;
+	                    		var timeSlotItemId = "#time_" + timeSlotKey;
+	                    		var totalSalesAmount = response.itemList[idxItemList].totalSalesAmount;	
+									
+	                            var strHtmlItem = '<a href="#" class="list-group-item">'+ timeSlotKey +
+									'&nbsp;&nbsp;<span id="time_'+ timeSlotKey + '" class="rounded">&nbsp;</span>' +
+									'<span class="pull-right text-muted small">' +
+									'<i class="fa fa-krw fa-fw"></i><em>' + totalSalesAmount + '</em>' +
+									'</span></a>';
+	                            
+	                            $("#list_timebase_sales_amount").append(strHtmlItem);
+	                            $(timeSlotItemId).css("width", Math.round(parseInt(totalSalesAmount)/10000) +"px");
+	                    	}
+	                    	
+	                        $('#myModal').modal('hide');
+	                    },
+	                    error: function () {
+	                        $('#myModal').modal('hide');
+	                        alert("Error loading data! Please try again.");
+	                    }	
+	                });	
+			}
+			
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// [END] - SalesVolume By TimeBase
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // [START] - SalesVolume By DayOfWeek
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			funcLoadDayOfWeekSalesVolumeDataWithElement = function(element){
+				if(element!=null){
+					funcLoadDayOfWeekSalesVolumeData(curSelectYear, $(element).text());
+				}
+			}
+
+			funcLoadDayOfWeekSalesVolumeData = function(year,monthName){
+				
+				 var numOfMonthObj = getNumOfMonthByNameOfMonth(month_keys_dict, monthName);
+				 var numofMonthValue = numOfMonthObj[0].numOfMonth;
+				
+				 $.ajax({
+	                    type: "GET",
+	                    dataType: "json",
+	                    contentType: "application/json",
+	                    url: "/salestemperature.v3/api/salesvolume/dayofweek_sales_vol/" + year + "/" + numofMonthValue,
+	                    beforeSend : function(){
+	                        $('#myModal').modal('show');
+	                    },
+	                    success: function (response) {
+	
+	                    	$("#dayofweek_sales_amount_items_caption").text(monthName);	
+	                    	
+	                    	$("#list_weekofday_sales_amount").children().remove();
+	                        
+	                    	for(var idxItemList in response.itemList){
+	                    		
+	                    		var key = response.itemList[idxItemList].itemName;
+	                    		var itemId = "#dayofweek_" + key;
+	                    		var totalSalesAmount = response.itemList[idxItemList].totalSalesAmount;	
+									
+	                            var strHtmlItem = '<a href="#" class="list-group-item">'+ '<span style="display:inline-block; width:50px">' + key + '</span>' +
+									'<span id="dayofweek_'+ key + '" class="rounded">&nbsp;</span>' +
+									'<span class="pull-right text-muted small">' +
+									'<i class="fa fa-krw fa-fw"></i><em>' + totalSalesAmount + '</em>' +
+									'</span></a>';
+	                            
+	                            $("#list_weekofday_sales_amount").append(strHtmlItem);
+	                            $(key).css("width", "500px");
+	                            $(itemId).css("width", Math.round(parseInt(totalSalesAmount)/2000) +"px");
+	                    	}
+	                    	
+	                        $('#myModal').modal('hide');
+	                    },
+	                    error: function () {
+	                        $('#myModal').modal('hide');
+	                        alert("Error loading data! Please try again.");
+	                    }	
+	                });	
+			}
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// [END] - SalesVolume By DayOfWeek
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				
+			
+    		funcQueryReportPerYear = function(year,nameOfMonth){
     			
     			curSelectYear = year;
     			
@@ -358,21 +438,16 @@
     			
 				$("#selected_year_caption").html(year_combo_caption);
 				
-    			/*
-				funcLoadDescSalesVolumeData(curSelectYear);
-				funcLoadMonthlySalesVolumeData(curSelectYear);
-				funcLoadProductCategorySalesVolumeData(curSelectYear);
-				funcSelectDayOfWeekItem(null);
-				*/
-				
 				funcLoadDescSalesVolumeData();
 	        	funcLoadMonthlySalesVolumeData();
 	        	funcLoadCategoriesSalesVolumeData();
+	        	funcLoadTimeBaseSalesVolumeData(curSelectYear, "Dec.");
+	        	funcLoadDayOfWeekSalesVolumeData(curSelectYear, "Dec.");
     		}
 		})
             
         $(window).load(function(){
-        	funcQueryReportPerYear('2015');
+        	funcQueryReportPerYear("2014","12");
         })
 		
 	</script>
@@ -523,7 +598,7 @@
                         </div>
                         <a href="#">
                             <div class="panel-footer">
-                                <span class="pull-left">Amount of sales</span>
+                                <span class="pull-left">Amount of Sales</span>
                                 <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
                                 <div class="clearfix"></div>
                             </div>
@@ -541,13 +616,13 @@
                                     <div class="huge">
                                     	<span id="total_sales_count"></span>
                                     </div>
-                                    <div>times</div>
+                                    <div>items</div>
                                 </div>
                             </div>
                         </div>
                         <a href="#">
                             <div class="panel-footer">
-                                <span class="pull-left">Number of sales</span>
+                                <span class="pull-left">Number of Items</span>
                                 <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
                                 <div class="clearfix"></div>
                             </div>
@@ -571,7 +646,7 @@
                         </div>
                         <a href="#">
                             <div class="panel-footer">
-                                <span class="pull-left">Daily average amount</span>
+                                <span class="pull-left">Daily average Amount</span>
                                 <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
                                 <div class="clearfix"></div>
                             </div>
@@ -589,13 +664,13 @@
                                     <div class="huge">
                                     	<span id="avrg_sales_count"></span>
                                     </div>
-                                    <div>times</div>
+                                    <div>items</div>
                                 </div>
                             </div>
                         </div>
                         <a href="#">
                             <div class="panel-footer">
-                                <span class="pull-left">Daily average number</span>
+                                <span class="pull-left">Daily average Items</span>
                                 <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
                                 <div class="clearfix"></div>
                             </div>
@@ -642,25 +717,30 @@
                 </div>
                 <!-- /.col-lg-8 -->
                 <div class="col-lg-4">
+                	<div class="row">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <i class="glyphicon glyphicon-time"></i> Hourly average sales.Amount
+                            <i class="glyphicon glyphicon-time"></i> Hourly total sales amount of Month.
                             <div class="pull-right">
    								<div class="btn-group">
                                     <button id="timebase_sales_amount_items_caption" type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
-										All
+										Select.
                                         <!--  <span class="caret"></span> -->
                                     </button>
                                     <ul id="timebase_sales_amount_items_list" class="dropdown-menu pull-right" role="menu">
                                     	<!-- Fill Category Items dynamically -->
-                                    	<li><a href='#' onclick='funcSelectDayOfWeekItem(this);return false;'>W-MON</a></li>
-										<li><a href='#' onclick='funcSelectDayOfWeekItem(this);return false;'>W-TUE</a></li>
-										<li><a href='#' onclick='funcSelectDayOfWeekItem(this);return false;'>W-WED</a></li>
-										<li><a href='#' onclick='funcSelectDayOfWeekItem(this);return false;'>W-THU</a></li>
-										<li><a href='#' onclick='funcSelectDayOfWeekItem(this);return false;'>W-FRI</a></li>
-										<li><a href='#' onclick='funcSelectDayOfWeekItem(this);return false;'>W-SAT</a></li>
-										<li><a href='#' onclick='funcSelectDayOfWeekItem(this);return false;'>W-SUN</a></li>
-										<li><a href='#' onclick='funcSelectDayOfWeekItem(this);return false;'>All</a></li>
+                                    	<li><a href='#' onclick='funcLoadTimeBaseSalesVolumeDataWithElement(this);return false;'>Jan.</a></li>
+										<li><a href='#' onclick='funcLoadTimeBaseSalesVolumeDataWithElement(this);return false;'>Feb.</a></li>
+										<li><a href='#' onclick='funcLoadTimeBaseSalesVolumeDataWithElement(this);return false;'>Mar.</a></li>
+										<li><a href='#' onclick='funcLoadTimeBaseSalesVolumeDataWithElement(this);return false;'>Apr.</a></li>
+										<li><a href='#' onclick='funcLoadTimeBaseSalesVolumeDataWithElement(this);return false;'>May.</a></li>
+										<li><a href='#' onclick='funcLoadTimeBaseSalesVolumeDataWithElement(this);return false;'>Jun.</a></li>
+										<li><a href='#' onclick='funcLoadTimeBaseSalesVolumeDataWithElement(this);return false;'>Jul.</a></li>
+										<li><a href='#' onclick='funcLoadTimeBaseSalesVolumeDataWithElement(this);return false;'>Aug.</a></li>
+										<li><a href='#' onclick='funcLoadTimeBaseSalesVolumeDataWithElement(this);return false;'>Sep.</a></li>
+										<li><a href='#' onclick='funcLoadTimeBaseSalesVolumeDataWithElement(this);return false;'>Oct.</a></li>
+										<li><a href='#' onclick='funcLoadTimeBaseSalesVolumeDataWithElement(this);return false;'>Nov.</a></li>
+										<li><a href='#' onclick='funcLoadTimeBaseSalesVolumeDataWithElement(this);return false;'>Dec.</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -672,6 +752,42 @@
                         </div>
                         <!-- /.panel-body -->
                     </div>
+ 
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="glyphicon glyphicon-paperclip"></i> Average sales amount Per Week of day.
+                            <div class="pull-right">
+   								<div class="btn-group">
+                                    <button id="dayofweek_sales_amount_items_caption" type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+										Select.
+                                        <!--  <span class="caret"></span> -->
+                                    </button>
+                                    <ul id="dayofweek_sales_amount_items_list" class="dropdown-menu pull-right" role="menu">
+                                    	<!-- Fill Category Items dynamically -->
+                                    	<li><a href='#' onclick='funcLoadDayOfWeekSalesVolumeDataWithElement(this);return false;'>Jan.</a></li>
+										<li><a href='#' onclick='funcLoadDayOfWeekSalesVolumeDataWithElement(this);return false;'>Feb.</a></li>
+										<li><a href='#' onclick='funcLoadDayOfWeekSalesVolumeDataWithElement(this);return false;'>Mar.</a></li>
+										<li><a href='#' onclick='funcLoadDayOfWeekSalesVolumeDataWithElement(this);return false;'>Apr.</a></li>
+										<li><a href='#' onclick='funcLoadDayOfWeekSalesVolumeDataWithElement(this);return false;'>May.</a></li>
+										<li><a href='#' onclick='funcLoadDayOfWeekSalesVolumeDataWithElement(this);return false;'>Jun.</a></li>
+										<li><a href='#' onclick='funcLoadDayOfWeekSalesVolumeDataWithElement(this);return false;'>Jul.</a></li>
+										<li><a href='#' onclick='funcLoadDayOfWeekSalesVolumeDataWithElement(this);return false;'>Aug.</a></li>
+										<li><a href='#' onclick='funcLoadDayOfWeekSalesVolumeDataWithElement(this);return false;'>Sep.</a></li>
+										<li><a href='#' onclick='funcLoadDayOfWeekSalesVolumeDataWithElement(this);return false;'>Oct.</a></li>
+										<li><a href='#' onclick='funcLoadDayOfWeekSalesVolumeDataWithElement(this);return false;'>Nov.</a></li>
+										<li><a href='#' onclick='funcLoadDayOfWeekSalesVolumeDataWithElement(this);return false;'>Dec.</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <div id="list_weekofday_sales_amount" class="list-group">
+                            </div>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+ 				</div>
  
                 </div>
                 <!-- /.col-lg-4 -->
@@ -697,7 +813,7 @@
     <script src="/salestemperature.v3/static/bower_components/morrisjs/morris.min.js"></script>
 
     <!-- Custom Theme JavaScript -->
-    <script src="/salestemperature.v3/static/dist/js/sb-admin-2.js' %}"></script>
+    <script src="/salestemperature.v3/static/dist/js/sb-admin-2.js"></script>
 
 </body>
 

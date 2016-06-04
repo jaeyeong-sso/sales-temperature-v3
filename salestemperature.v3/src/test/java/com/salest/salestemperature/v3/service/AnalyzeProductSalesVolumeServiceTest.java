@@ -17,7 +17,7 @@ import com.salest.salestemperature.v3.model.SalesVolume;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations="/config/applicationContext.xml")
-public class ServiceTest {
+public class AnalyzeProductSalesVolumeServiceTest {
 	
 	@Autowired
 	private ApplicationContext context;
@@ -73,4 +73,25 @@ public class ServiceTest {
 		assertTrue(listResult.size() > 0);
 	}
 	
+	//@Test
+	public void getTimebaseSalesVolumeOfMonthTest(){
+		List<SalesVolume> listResult = analyzeProductSalesVolumeService.getTimebaseSalesVolumeOfMonth("2014-09");
+		
+		for(SalesVolume salesVolumeItem : listResult){
+			System.out.println(salesVolumeItem.toString());
+		}
+
+		assertTrue(listResult.size() > 0);
+	}
+	
+	//@Test
+	public void getDayOfWeekSalesVolumeOfMonthTest(){
+		List<SalesVolume> listResult = analyzeProductSalesVolumeService.getDayOfWeekSalesVolumeOfMonth("2014-09");
+		
+		for(SalesVolume salesVolumeItem : listResult){
+			System.out.println(salesVolumeItem.toString());
+		}
+	
+		assertTrue(listResult.size() > 0);
+	}
 }

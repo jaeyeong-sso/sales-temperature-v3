@@ -32,6 +32,10 @@ public class SalesVolume {
 		return this.totalSalesAmount;
 	}
 	
+	public void setOptItemName(String optItemName){
+		this.optItemName = optItemName;
+	}
+	
 	@Override
 	public String toString() {
 		
