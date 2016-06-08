@@ -32,10 +32,6 @@ public class SalesvolumeResource {
 	@Autowired
 	AnalyzeSalesVolumeService analyzeSalesVolumeService;
 	
-	@Autowired
-	ProductsInfoService productsInfoService;
-	
-	
 	@GET
 	@Path("/annual_sales_vol_sum/{queryYear}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -191,6 +187,7 @@ public class SalesvolumeResource {
 		}
 	}
 	
+	/*
 	@GET
 	@Path("/get_products_category")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -223,5 +220,5 @@ public class SalesvolumeResource {
 			return Response.status(500).build();
 		}
 	}
-	
+	*/
 }

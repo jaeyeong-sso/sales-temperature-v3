@@ -10,5 +10,6 @@ public class JerseyApplication extends ResourceConfig {
 		register(RequestContextFilter.class);
 		register(MultiPartFeature.class);
 		register(SalesvolumeResource.class);
+		register(ProductInfoResource.class);
 	}
 }

@@ -62,6 +62,7 @@ public class SalesVolumeResourceTest extends JerseyTest {
 	    	assertTrue(response.getStatus() == 200);
 	    }
 	    
+	    /*
 	    @Test
 	    public void get_products_category_test(){
 	    	Response response = target("salesvolume/get_products_category").request().get(Response.class);
@@ -73,5 +74,6 @@ public class SalesVolumeResourceTest extends JerseyTest {
 	    	Response response = target("salesvolume/get_products_items/Ä¿ÇÇ").request().get(Response.class);
 	    	assertTrue(response.getStatus() == 200);
 	    }
+	    */
 	    
 }
