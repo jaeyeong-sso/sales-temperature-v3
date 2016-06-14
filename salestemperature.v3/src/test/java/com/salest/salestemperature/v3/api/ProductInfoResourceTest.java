@@ -19,13 +19,13 @@ public class ProductInfoResourceTest extends JerseyTest {
         return new ResourceConfig(ProductInfoResource.class).property("contextConfigLocation", "classpath:/config/applicationContext.xml");  
     }
     
-    @Test
+    //@Test
     public void get_products_category_test(){
     	Response response = target("productinfo/get_products_category").request().get(Response.class);
     	assertTrue(response.getStatus() == 200);
     }
     
-    @Test
+    //@Test
     public void get_products_items_test(){
     	Response response = target("productinfo/get_products_items/Ä¿ÇÇ").request().get(Response.class);
     	assertTrue(response.getStatus() == 200);

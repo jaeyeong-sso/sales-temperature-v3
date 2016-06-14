@@ -34,7 +34,10 @@ public class ProductInfoResource {
 		List<String> responseItems = productsInfoService.getProductCategoriesInfo();
 
 		if(responseItems.size()>0){
-			return Response.status(200).entity(responseItems).build();
+			
+			return Response.status(200).entity("{\"testKey\":\"testValue\"}").build();
+			
+			//return Response.status(200).entity(responseItems).build();
 		} else {
 			return Response.status(500).build();
 		}

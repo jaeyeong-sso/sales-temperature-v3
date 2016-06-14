@@ -196,19 +196,19 @@
 						data: jsonParams,
 						contentType: 'application/json; charset=UTF-8',
 						dataType: "json",
-						url: "/salest_dashbd/api/req_write_transaction_log",
+						url: "/salestemperature.v3/api/saleslog",
 	                    beforeSend : function(){
 	                        $('#ProgressModal').modal('show');
 	                    },
 						success: function (response) {
 							
-							setTimeout(funcPollingRealTimeBaseSalesData(),3000);
+							//setTimeout(funcPollingRealTimeBaseSalesData(),3000);
 				        	
 							$('#ProgressModal').modal('hide');
 						}, 
-						error: function () {
+						error: function (response) {
 	                        $('#ProgressModal').modal('hide');
-							alert("Error loading data! Please try again.");
+							//alert("Error loading data! Please try again.");
 						}
 					});
 			}
