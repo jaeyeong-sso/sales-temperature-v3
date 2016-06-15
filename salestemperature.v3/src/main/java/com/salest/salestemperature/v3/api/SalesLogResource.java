@@ -22,7 +22,6 @@ public class SalesLogResource {
    	@Autowired
    	SalesLogService salesLogService;
    	
-   	
    	final private String PARAM_KEY_PRODUCT_NAME = "product_name";
    	final private String PARAM_KEY_TR_DATE = "tr_date";
    	final private String PARAM_TR_TIME = "tr_time";
