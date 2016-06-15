@@ -26,14 +26,19 @@ public class ProductInfoServiceController {
 
 	@RequestMapping(value="/get_products_category", method=RequestMethod.GET)
 	@ResponseBody
-	public List<String> getProductsCategory(){
+	public ResponseEntity<?> getProductsCategory(){
 		List<String> responseItems = productsInfoService.getProductCategoriesInfo();
-		return responseItems;
+		
+		if(responseItems!=null && responseItems.size()>0){
+			return new ResponseEntity<List<String>>(responseItems, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@RequestMapping(value="/get_products_items/{categoryName}", method=RequestMethod.GET)
 	@ResponseBody
-	public List<ProductDetailResponse> getPopularProductItemsNames(@PathVariable String categoryName){
+	public ResponseEntity<?> getPopularProductItemsNames(@PathVariable String categoryName){
 		
 		List<ProductDetailResponse> responseItems = new ArrayList<ProductDetailResponse>();
 		List<Product> products = productsInfoService.getProductItemsDetails(categoryName);
@@ -42,7 +47,11 @@ public class ProductInfoServiceController {
 			responseItems.add(new ProductDetailResponse(product.getId(), product.getName(),product.getPrice()));
 		}
 			
-		return responseItems;
+		if(products!=null && responseItems.size()>0){
+			return new ResponseEntity<List<ProductDetailResponse>>(responseItems, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 }
