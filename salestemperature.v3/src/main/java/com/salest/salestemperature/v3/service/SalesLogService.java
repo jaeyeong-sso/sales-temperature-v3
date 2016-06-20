@@ -17,6 +17,12 @@ public class SalesLogService {
 	Provider<ProductInfoDtoService> productInfoDtoServiceProvider;
 	private ProductInfoDtoService productInfoDtoService;
 	
+	private RedisCacheService redisCacheService;
+	
+	public void setRedisCacheService(RedisCacheService redisCacheService){
+		this.redisCacheService = redisCacheService;
+	}
+	
 	private Logger logger = Logger.getLogger(SalesLogService.class);
 	
 	public boolean writeSalesLog(final String product_name, String transaction_date, String transaction_time){
@@ -31,9 +37,12 @@ public class SalesLogService {
 	    });
 		
 		if(targetProduct!=null){
+			
+			long salesCounter = redisCacheService.createOrIncrCounterValue(RedisCacheService.TOTAL_SALES_COUNTER_OF_DAY, 1L);
+			
 			//2014-12-01-09,18:57:35,106,1,4500
-			String message = String.format("%s,%s,%s,%d,%d", 
-					transaction_date, transaction_time, targetProduct.getId(), 1, targetProduct.getPrice());
+			String message = String.format("%s-%02d,%s,%s,%d,%d", 
+					transaction_date, salesCounter, transaction_time, targetProduct.getId(), 1, targetProduct.getPrice());
 			
 			System.out.println("[writeSalesLog] : " + message);
 			

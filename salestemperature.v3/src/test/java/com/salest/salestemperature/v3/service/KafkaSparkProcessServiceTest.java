@@ -29,7 +29,7 @@ public class KafkaSparkProcessServiceTest {
 		assertNotNull(kafkaSparkProcessService);
 	}
 	
-	@Test
+	//@Test
 	public void processMessageTest(){
 		kafkaSparkProcessService.startProcessMessageStreams();
 	}

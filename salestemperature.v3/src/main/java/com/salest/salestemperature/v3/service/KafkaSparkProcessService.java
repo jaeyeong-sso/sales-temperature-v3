@@ -50,6 +50,7 @@ public class KafkaSparkProcessService {
 	
 	
 	public class ProcesssStreamRunner implements Runnable {
+ 
 		public void run() {
 			// TODO Auto-generated method stub
 			startProcessMessageStreams();
@@ -58,7 +59,8 @@ public class KafkaSparkProcessService {
 	
 	public void startProcessMessageStreams(){
 	
-
+	    final String regEx= "[^0-9a-zA-Z-:,]+";
+	    
 	    Set<String> topicsSet = new HashSet<String>(Arrays.asList(TOPIC));
 	    Map<String, String> kafkaParams = new HashMap<String, String>();
 	    kafkaParams.put("metadata.broker.list", MESSAGE_BROKER);
@@ -76,13 +78,25 @@ public class KafkaSparkProcessService {
 	        topicsSet
 	    ); 
 	    
-	    messagesDStream.print();
-	    
+	    //messagesDStream.print();
+
 	    messagesDStream.foreachRDD(new Function<JavaPairRDD<String, String>, Void>() {
 	    	public Void call(JavaPairRDD<String, String> rdd) throws IOException {
+	    		
+	    	    String lastMessageUuid = null;
+	    	    String curMessageUuid, salesLogMessage;
+	    	    
 	    		List<Tuple2<String,String>> rddList = rdd.collect();
 	    		for(Tuple2<String,String> rddItem : rddList){
-	    			System.out.println(rddItem._1 + "	" + rddItem._2);
+	    			
+	    			String[] messageTokens = rddItem._2.split(regEx);
+	    			curMessageUuid = messageTokens[messageTokens.length-2];
+	    			salesLogMessage = messageTokens[messageTokens.length-1];
+	    			
+	    			if(!curMessageUuid.equals(lastMessageUuid)){
+	    				System.out.println(curMessageUuid + " / "+ salesLogMessage);
+	    			}
+	    			lastMessageUuid = curMessageUuid;
 	    		}
 	    		return null;
 	    	}
