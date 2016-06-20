@@ -12,26 +12,26 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations="/config/applicationContext.xml")
-public class KafkaClientServiceTest {
+public class KafkaSparkProcessServiceTest {
 
 	@Autowired
 	private ApplicationContext context;
 	
-	private KafkaClientService kafkaClientService;
+	private KafkaSparkProcessService kafkaSparkProcessService;
 	
 	@Before
 	public void setUp(){
-		this.kafkaClientService = context.getBean("kafkaClientService", KafkaClientService.class);
+		this.kafkaSparkProcessService = context.getBean("kafkaSparkProcessService", KafkaSparkProcessService.class);
 	}
 	
 	@Test
 	public void beanLoadingTest(){
-		assertNotNull(kafkaClientService);
+		assertNotNull(kafkaSparkProcessService);
 	}
 	
-	//@Test
-	public void processMessageWithKafkaConsumerClientTest(){
-		kafkaClientService.startProcessMessageWithKafkaConsumerClient();
+	@Test
+	public void processMessageTest(){
+		kafkaSparkProcessService.startProcessMessageStreams();
 	}
 	
 }

@@ -47,8 +47,9 @@
 	</bean>
 	
 	<bean id="salesLogService" class="com.salest.salestemperature.v3.service.SalesLogService" />
-
+<!--
 	<bean id="kafkaClientService" class="com.salest.salestemperature.v3.service.KafkaClientService" />
+-->
 
 	<bean id="kafkaSparkProcessService" class="com.salest.salestemperature.v3.service.KafkaSparkProcessService" />
 

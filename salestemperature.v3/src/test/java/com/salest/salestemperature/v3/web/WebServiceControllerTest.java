@@ -78,7 +78,7 @@ public class WebServiceControllerTest {
 		assertNotNull(this.wac.getBean(SalesLogServiceController.class));
 	}
 	
-	@Test
+	//@Test
 	public void integrationSalesLogServiceControllerTest() throws Exception{
 		
 		MockHttpSession mocksession_1 = new MockHttpSession();
