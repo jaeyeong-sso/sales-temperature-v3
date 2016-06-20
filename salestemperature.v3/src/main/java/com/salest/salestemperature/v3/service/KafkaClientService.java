@@ -48,20 +48,38 @@ public class KafkaClientService {
 	
 	
 	public class ConsumerRunner implements Runnable {
-	    private KafkaStream m_stream;
-	    private int m_threadNumber;
+	    
+		private KafkaStream msgStream;
 	 
-	    public ConsumerRunner(KafkaStream a_stream, int a_threadNumber) {
-	        m_threadNumber = a_threadNumber;
-	        m_stream = a_stream;
+	    private String lastMessageUuid;
+	    private final String regEx= "[^0-9a-zA-Z-:,]+";
+	    
+	    private String curMessageUuid;
+	    private String salesLogMessage;
+	    
+	    public ConsumerRunner(KafkaStream msgStream) {
+	    	this.msgStream = msgStream;
 	    }
 	 
 	    public void run() {
-	        ConsumerIterator<byte[], byte[]> it = m_stream.iterator();
-	        while (it.hasNext()){
-	            System.out.println("Thread " + m_threadNumber + ": " + new String(it.next().message()));
+	        ConsumerIterator<byte[], byte[]> iter = this.msgStream.iterator();
+	        while (iter.hasNext()){
+	        	String message = new String(iter.next().message());
+	        	System.out.println(message);
+	        	
+	        	/*
+	            String[] regexMessageTokens = message.split(regEx);
+	            
+	            curMessageUuid = regexMessageTokens[regexMessageTokens.length-2];
+	            salesLogMessage = regexMessageTokens[regexMessageTokens.length-1];
+	            		
+	            if(!curMessageUuid.equals(lastMessageUuid)){
+	            	System.out.println("Received Message From Kafka : " + salesLogMessage);
+	            }
+	            
+	            lastMessageUuid = curMessageUuid;
+	            */
 	        }
-	        System.out.println("Shutting down Thread: " + m_threadNumber);
 	    }
 	}
 	
@@ -104,7 +122,7 @@ public class KafkaClientService {
         KafkaStream<byte[], byte[]> stream =  consumerMap.get(TOPIC).get(0);
         
 		this.executor = Executors.newFixedThreadPool(1);
-	    executor.execute(new ConsumerRunner(stream, 1));
+	    executor.execute(new ConsumerRunner(stream));
 	    
 	}
 }

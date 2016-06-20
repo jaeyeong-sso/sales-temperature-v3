@@ -9,13 +9,16 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.salest.salestemperature.v3.api.model.SalesLogRequest;
 import com.salest.salestemperature.v3.service.SalesLogService;
 
 @Controller
@@ -25,14 +28,12 @@ public class SalesLogServiceController {
    	@Autowired
    	SalesLogService salesLogService;
    	
-	@RequestMapping(value="/write", method=RequestMethod.POST)
+	@RequestMapping(value="/write", method=RequestMethod.POST, produces = {MediaType.APPLICATION_JSON_VALUE})
 	@ResponseBody
 	public ResponseEntity<?> writeSalesLog(
-			@RequestParam(value="product_name", required=true) String reqProductName,
-			@RequestParam(value="tr_date", required=true) String reqTrDate,
-			@RequestParam(value="tr_time", required=true) String reqTrTime ) {
+			@RequestBody SalesLogRequest reqParamObj) {
 		
-		if(salesLogService.writeSalesLog(reqProductName, reqTrDate, reqTrTime)){
+		if(salesLogService.writeSalesLog(reqParamObj.getProductName(), reqParamObj.getTrDate(), reqParamObj.getTrTime())){
 			return new ResponseEntity<String>(HttpStatus.OK);
 		} else {
 			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);

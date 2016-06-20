@@ -85,7 +85,7 @@
 	                    type: "GET",
 	                    dataType: "json",
 	                    contentType: "application/json",
-	                    url: "/salest_dashbd/api/get_timebase_data_on_today_specific_date/" + tr_date,
+	                    url: "/salest_dashbd/web/get_timebase_data_on_today_specific_date/" + tr_date,
 	                    success: function (response) {
 	                    	
 	                    	var jsonObj = $.parseJSON(response);
@@ -127,7 +127,7 @@
 	                    type: "GET",
 	                    dataType: "json",
 	                    contentType: "application/json",
-	                    url: "/salest_dashbd/api/get_timebase_data_on_past_specific_date/" + date,
+	                    url: "/salest_dashbd/web/get_timebase_data_on_past_specific_date/" + date,
 	                    beforeSend : function(){
 	                        $('#ProgressModal').modal('show');
 	                    },
@@ -187,16 +187,16 @@
 				if( funcEvalProductSelectionState(product_name, tr_date, tr_time) == false){
 					return;
 				}
-				var jsonParams = "{\"product_name\":\"" + product_name + 
-					"\",\"tr_date\":\"" + tr_date +
-					"\",\"tr_time\":\"" + tr_time +  "\"}";
+				var jsonParams = "{\"productName\":\"" + product_name + 
+					"\",\"trDate\":\"" + tr_date +
+					"\",\"trTime\":\"" + tr_time +  "\"}";
 				
 					$.ajax({
 						type: "POST",
 						data: jsonParams,
 						contentType: 'application/json; charset=UTF-8',
 						dataType: "json",
-						url: "/salestemperature.v3/api/saleslog",
+						url: "/salestemperature.v3/web/saleslog/write",
 	                    beforeSend : function(){
 	                        $('#ProgressModal').modal('show');
 	                    },
@@ -219,7 +219,7 @@
 					type: "GET",
                     dataType: "json",
                     contentType: "application/json",
-					url:"/salestemperature.v3/api/productinfo/get_products_category",
+					url:"/salestemperature.v3/web/productinfo/get_products_category",
                     beforeSend : function(){
                         $('#ProgressModal').modal('show');
                     },
@@ -249,7 +249,7 @@
 					type: "GET",
                     dataType: "json",
                     contentType: "application/json",
-					url:"/salestemperature.v3/api/productinfo/get_products_items/" + categoryName,
+					url:"/salestemperature.v3/web/productinfo/get_products_items/" + categoryName,
                     beforeSend : function(){
                         $('#ProgressModal').modal('show');
                     },

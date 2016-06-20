@@ -129,7 +129,7 @@
                     type: "GET",
                     dataType: "json",
                     contentType: "application/json",
-                    url: "/salestemperature.v3/api/salesvolume/monthly_sales_vol/" + curSelectYear,
+                    url: "/salestemperature.v3/web/salesvolume/monthly_sales_vol/" + curSelectYear,
                     beforeSend : function(){
                         $('#myModal').modal('show');
                     },
@@ -162,7 +162,7 @@
                     type: "GET",
                     dataType: "json",
                     contentType: "application/json",
-                    url: "/salestemperature.v3/api/salesvolume/annual_sales_vol_sum/" + curSelectYear,
+                    url: "/salestemperature.v3/web/salesvolume/annual_sales_vol_sum/" + curSelectYear,
                     beforeSend : function(){
                         $('#myModal').modal('show');
                     },
@@ -212,7 +212,7 @@
                     type: "GET",
                     dataType: "json",
                     contentType: "application/json",
-                    url: "/salestemperature.v3/api/salesvolume/products_sales_vol/" + curSelectYear,
+                    url: "/salestemperature.v3/web/salesvolume/products_sales_vol/" + curSelectYear,
                     beforeSend : function(){
                         $('#myModal').modal('show');
                     },
@@ -266,7 +266,7 @@
                     type: "GET",
                     dataType: "json",
                     contentType: "application/json",
-                    url: "/salestemperature.v3/api/salesvolume/products_sales_vol/" + curSelectYear + "/" + selCategoryName,
+                    url: "/salestemperature.v3/web/salesvolume/products_sales_vol/" + curSelectYear + "/" + selCategoryName,
                     beforeSend : function(){
                         $('#myModal').modal('show');
                     },
@@ -333,7 +333,7 @@
 	                    type: "GET",
 	                    dataType: "json",
 	                    contentType: "application/json",
-	                    url: "/salestemperature.v3/api/salesvolume/timebase_sales_vol/" + year + "/" + numofMonthValue,
+	                    url: "/salestemperature.v3/web/salesvolume/timebase_sales_vol/" + year + "/" + numofMonthValue,
 	                    beforeSend : function(){
 	                        $('#myModal').modal('show');
 	                    },
@@ -390,7 +390,7 @@
 	                    type: "GET",
 	                    dataType: "json",
 	                    contentType: "application/json",
-	                    url: "/salestemperature.v3/api/salesvolume/dayofweek_sales_vol/" + year + "/" + numofMonthValue,
+	                    url: "/salestemperature.v3/web/salesvolume/dayofweek_sales_vol/" + year + "/" + numofMonthValue,
 	                    beforeSend : function(){
 	                        $('#myModal').modal('show');
 	                    },

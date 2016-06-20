@@ -42,11 +42,11 @@ public class CategoryDao {
 				for(int i=0; i<strProducts.length; i++){
 					String[] strProductField = strProducts[i].split(":");
 					
-					productsMap.put(strProductField[1], 
+					productsMap.put(strProductField[1].trim(), 
 							new Product.ProductBuilder()
-								.withId(strProductField[0])
-								.withName(strProductField[1])
-								.withPrice(Integer.parseInt(strProductField[2])).build());		
+								.withId(strProductField[0].trim())
+								.withName(strProductField[1].trim())
+								.withPrice(Integer.parseInt(strProductField[2].trim())).build());		
 				}
 				
 				return new Category.CategoryBuilder().withName(cateName).withProductsMap(productsMap).build();

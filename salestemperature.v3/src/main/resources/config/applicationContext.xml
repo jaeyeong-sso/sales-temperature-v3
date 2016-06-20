@@ -8,14 +8,17 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
 
+	<mvc:annotation-driven /> 
+
 	<context:component-scan base-package="com.salest.salestemperature.v3.dto" />
 	
+	<!--
 	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
 		<property name="messageConverters">
 			<bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"/>
 		</property>	
 	</bean>
-
+	-->
 
 	<bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor" />
 	
@@ -45,8 +48,8 @@
 	
 	<bean id="salesLogService" class="com.salest.salestemperature.v3.service.SalesLogService" />
 
-
-	<bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor" />
 	<bean id="kafkaClientService" class="com.salest.salestemperature.v3.service.KafkaClientService" />
-	
+
+	<bean id="kafkaSparkProcessService" class="com.salest.salestemperature.v3.service.KafkaSparkProcessService" />
+
 </beans>

@@ -32,12 +32,13 @@ public class SalesLogService {
 		
 		if(targetProduct!=null){
 			//2014-12-01-09,18:57:35,106,1,4500
-			String message = String.format("%s,%s,%s,1,%s", 
-					transaction_date, transaction_time,targetProduct.getId(), targetProduct.getPrice());
+			String message = String.format("%s,%s,%s,%d,%d", 
+					transaction_date, transaction_time, targetProduct.getId(), 1, targetProduct.getPrice());
 			
 			System.out.println("[writeSalesLog] : " + message);
 			
-			//logger.info(message);
+			logger.info(message);
+			
 			return true;
 		} else {
 			return false;

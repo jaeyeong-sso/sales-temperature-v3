@@ -31,6 +31,6 @@ public class SalesLogServiceTest {
 	
 	//@Test
 	public void writeSalesLogTest(){
-		salesLogService.writeSalesLog("product_name", "transaction_date", "transaction_time");
+		salesLogService.writeSalesLog("커피", "transaction_date", "transaction_time");
 	}
 }

@@ -29,7 +29,7 @@ public class KafkaClientServiceTest {
 		assertNotNull(kafkaClientService);
 	}
 	
-	@Test
+	//@Test
 	public void processMessageWithKafkaConsumerClientTest(){
 		kafkaClientService.startProcessMessageWithKafkaConsumerClient();
 	}
