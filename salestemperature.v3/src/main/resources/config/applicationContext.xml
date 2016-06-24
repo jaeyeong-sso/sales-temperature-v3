@@ -42,8 +42,9 @@
 		<property name="redisCacheService" ref="redisCacheService" />
 	</bean>
 
+<!--
 	<bean id="kafkaSparkProcessService" class="com.salest.salestemperature.v3.service.KafkaSparkProcessService" />
-
+-->
 	<bean id="redisCacheService" class="com.salest.salestemperature.v3.service.RedisCacheService" />
 	
 </beans>
