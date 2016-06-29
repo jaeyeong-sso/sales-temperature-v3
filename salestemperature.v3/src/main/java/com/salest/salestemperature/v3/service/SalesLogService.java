@@ -1,5 +1,7 @@
 package com.salest.salestemperature.v3.service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Provider;
@@ -19,6 +21,8 @@ public class SalesLogService {
 	
 	private RedisCacheService redisCacheService;
 	
+	private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			
 	public void setRedisCacheService(RedisCacheService redisCacheService){
 		this.redisCacheService = redisCacheService;
 	}
@@ -38,7 +42,10 @@ public class SalesLogService {
 		
 		if(targetProduct!=null){
 			
-			long salesCounter = redisCacheService.createOrIncrCounterValue(RedisCacheService.TOTAL_SALES_COUNTER_OF_DAY, 1L);
+			String strDateYMD = simpleDateFormat.format(new Date());
+			
+			long salesCounter = redisCacheService.createOrIncrCounterValue(
+					RedisCacheService.TOTAL_SALES_COUNTER_OF_DAY + strDateYMD, 1L);
 			
 			//2014-12-01-09,18:57:35,106,1,4500
 			String message = String.format("%s-%02d,%s,%s,%d,%d", 

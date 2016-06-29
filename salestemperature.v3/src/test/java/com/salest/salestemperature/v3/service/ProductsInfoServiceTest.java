@@ -36,6 +36,6 @@ public class ProductsInfoServiceTest {
 	
 	//@Test
 	public void getProductItemsDetailsTest(){
-		assertTrue(productsInfoService.getProductItemsDetails("Ä¿ÇÇ").size() > 0);
+		assertTrue(productsInfoService.getProductItemsDetails("Ä¿ï¿½ï¿½").size() > 0);
 	}
 }

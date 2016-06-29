@@ -78,7 +78,7 @@ public class WebServiceControllerTest {
 		assertNotNull(this.wac.getBean(SalesLogServiceController.class));
 	}
 	
-	//@Test
+	@Test
 	public void integrationSalesLogServiceControllerTest() throws Exception{
 		
 		MockHttpSession mocksession_1 = new MockHttpSession();
@@ -93,13 +93,15 @@ public class WebServiceControllerTest {
 			//.andDo(print())
 			.andExpect(status().isOk());
 		
+		/*
 		// [Case #1] Working in the same Session Bean Scope
 		this.mockMvc.perform(post("/saleslog/write").session(mocksession_1)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"product_name\":\"아메리카노\", \"tr_date\":\"2016-06-15\", \"tr_time\":\"15:38:00\"}"))
 			//.andDo(print())
 			.andExpect(status().isOk());
-
+		*/
+		
 		/*
 		// [Case #2] Working in the different Session Bean Scope
 		this.mockMvc.perform(post("/saleslog/write").session(mocksession_2)

@@ -16,7 +16,8 @@
 	
 	<bean id="dataSource" class="com.salest.salestemperature.v3.dao.DataSource">
 		<property name="jdbcDriverName" value="com.cloudera.impala.jdbc41.Driver" />
-		<property name="connectionUrl" value="jdbc:impala://192.168.118.132:21050/salest" />
+		
+		<property name="connectionUrl" value="jdbc:impala://salest-master-server:21050/salest" />
 	</bean>
 
 
@@ -42,9 +43,6 @@
 		<property name="redisCacheService" ref="redisCacheService" />
 	</bean>
 
-<!--
-	<bean id="kafkaSparkProcessService" class="com.salest.salestemperature.v3.service.KafkaSparkProcessService" />
--->
 	<bean id="redisCacheService" class="com.salest.salestemperature.v3.service.RedisCacheService" />
 	
 </beans>

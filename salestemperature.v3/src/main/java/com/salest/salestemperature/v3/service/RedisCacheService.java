@@ -10,7 +10,8 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 
 public class RedisCacheService {
 	
-	public static String TOTAL_SALES_COUNTER_OF_DAY = "total_sales_counter_of_day:2016-06-20";
+	public static String TOTAL_SALES_COUNTER_OF_DAY = "total_sales_counter_of_day:";
+	private static int KEY_EXPIRED_PERIOD = 60*60*24;
 	
 	private JedisPool jedisPool;
 	private Jedis jedis;
@@ -51,7 +52,7 @@ public class RedisCacheService {
 	public void createOrUpdateValueByKey(String key, String value){
 		//Jedis jedis = this.jedisPool.getResource(); 
 		try { 
-			jedis.setex(key, 60, value);
+			jedis.setex(key, KEY_EXPIRED_PERIOD, value);
 		} catch(JedisConnectionException e){ 
 			
 		} finally { 
@@ -70,7 +71,7 @@ public class RedisCacheService {
 			if(jedis.exists(key)){
 				jedis.incrBy(key, offset);
 			} else {
-				jedis.setex(key, 60, String.valueOf(1));
+				jedis.setex(key, KEY_EXPIRED_PERIOD, String.valueOf(1));
 			}
 			
 			incrResultCounterValue = Long.parseLong(jedis.get(key)); 
