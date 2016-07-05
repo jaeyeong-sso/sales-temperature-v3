@@ -28,11 +28,11 @@ public class ProductInfoServiceController {
 	@ResponseBody
 	public ResponseEntity<?> getProductsCategory(){
 		List<String> responseItems = productsInfoService.getProductCategoriesInfo();
-		
+		/*
 		for(String item : responseItems){
 			System.out.println("[getProductsCategory]: " + item);
 		}
-		
+		*/
 		if(responseItems!=null && responseItems.size()>0){
 			return new ResponseEntity<List<String>>(responseItems, HttpStatus.OK);
 		} else {

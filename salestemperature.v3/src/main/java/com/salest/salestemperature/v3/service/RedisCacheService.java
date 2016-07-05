@@ -1,5 +1,7 @@
 package com.salest.salestemperature.v3.service;
 
+import java.util.Set;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
@@ -47,6 +49,25 @@ public class RedisCacheService {
 		} 
 		
 		return readKey;
+	}
+	
+	public Set<String> readKeys(String pattern){
+		
+		Set<String> keysSet = null;
+		
+		//Jedis jedis = this.jedisPool.getResource(); 
+		try { 
+			keysSet = jedis.keys(pattern);
+			
+		} catch(JedisConnectionException e){ 
+			if(null != jedis){ 
+				keysSet = null;
+			} 
+		} finally { 
+			//jedisPool.close();
+		} 
+		
+		return keysSet;
 	}
 	
 	public void createOrUpdateValueByKey(String key, String value){

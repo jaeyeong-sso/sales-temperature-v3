@@ -78,7 +78,7 @@ public class WebServiceControllerTest {
 		assertNotNull(this.wac.getBean(SalesLogServiceController.class));
 	}
 	
-	@Test
+	//@Test
 	public void integrationSalesLogServiceControllerTest() throws Exception{
 		
 		MockHttpSession mocksession_1 = new MockHttpSession();
@@ -175,6 +175,34 @@ public class WebServiceControllerTest {
 		this.mockMvc.perform(get("/productinfo/get_products_category").session(mocksession_1))
 				.andDo(print())
 				.andExpect(status().isOk());
+	}
+		
+	@Test
+	public void realtimeSalesVolumeServiceControllerTest() throws Exception{
+		
+		MockHttpSession mocksession = new MockHttpSession();
+		
+		//this.mockMvc.perform(get("/productinfo/get_products_category").session(mocksession)).andExpect(status().isOk());
+		
+		/*
+		// By Product
+		this.mockMvc.perform(get("/realtimesalesvolume/saleslog_totalamount_of/product_of/2016-07-04").session(mocksession))
+				.andDo(print())
+				.andExpect(status().isOk());
+		*/
+		
+		// By Category
+		/*
+		this.mockMvc.perform(get("/realtimesalesvolume/saleslog_totalamount_of/category_of/2016-07-04").session(mocksession))
+				.andDo(print())
+				.andExpect(status().isOk());
+		*/
+		
+		// Timebase Sales Diff on past specific date
+		this.mockMvc.perform(get("/realtimesalesvolume/timebaseSalesDiff/2016-07-05").session(mocksession))
+				.andDo(print())
+				.andExpect(status().isOk());
+
 	}
 	
 }

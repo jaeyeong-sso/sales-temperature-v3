@@ -100,7 +100,7 @@ public class DaoTest {
 	//@Test
 	public void listingMajorProductsOfCategoryTest(){
 		
-		Category category = categoryDao.listingMajorProductsOfCategory("Ä¿ÇÇ");
+		Category category = categoryDao.listingMajorProductsOfCategory("Ä¿ï¿½ï¿½");
 		
 		Map<String,Product> productsMap = category.getProductsMap();
 
@@ -108,7 +108,7 @@ public class DaoTest {
 			System.out.println("[key]:" + key + "		[value]:" + productsMap.get(key).toString());
 		}
 		
-		assertEquals(category.getName(), category.getName(), "Ä¿ÇÇ");
+		assertEquals(category.getName(), category.getName(), "Ä¿ï¿½ï¿½");
 	}
 	
 	//@Test
@@ -130,6 +130,14 @@ public class DaoTest {
 	//@Test
 	public void listingDayOfWeekSalesVolumeOfMonth(){
 		List<SalesVolume> salesVolumes = salesVolumeDao.listingDayOfWeekSalesVolumeOfMonth("2014-09");
+		for(SalesVolume salesVolume : salesVolumes){
+			System.out.println(salesVolume.toString());
+		}
+	}
+	
+	//@Test
+	public void listingTimebaseSalesVolumeOfDate(){
+		List<SalesVolume> salesVolumes = salesVolumeDao.listingTimebaseSalesVolumeOfDate("2015-07-07");
 		for(SalesVolume salesVolume : salesVolumes){
 			System.out.println(salesVolume.toString());
 		}

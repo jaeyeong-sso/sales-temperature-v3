@@ -45,4 +45,6 @@
 
 	<bean id="redisCacheService" class="com.salest.salestemperature.v3.service.RedisCacheService" />
 	
+	<bean id="timeSeriesService" class="com.salest.salestemperature.v3.service.TimeSeriesService" />
+	
 </beans>

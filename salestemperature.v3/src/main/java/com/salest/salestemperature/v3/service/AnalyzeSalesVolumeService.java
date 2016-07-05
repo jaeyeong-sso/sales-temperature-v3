@@ -200,4 +200,26 @@ public class AnalyzeSalesVolumeService {
 		
 		return salesVolumes;
 	}
+	
+	public List<SalesVolume> getTimebaseSalesVolumeOfDate(String queryYearMonthDay){
+		List<SalesVolume> salesVolumes = salesVolumeDao.listingTimebaseSalesVolumeOfDate(queryYearMonthDay);
+		
+		SalesVolume findObject = (SalesVolume)CollectionUtils.find(salesVolumes, new org.apache.commons.collections.Predicate() {
+	        public boolean evaluate(Object salesVolume) {
+	            return ((SalesVolume)salesVolume).getOptItemName().equals("00");
+	        }
+	    });
+
+		if(findObject!=null){
+			findObject.setOptItemName("24");
+		}
+		
+		Collections.sort(salesVolumes, new Comparator<SalesVolume>() {
+			public int compare(SalesVolume first, SalesVolume second) {
+				return first.getOptItemName().compareTo(second.getOptItemName());
+			}
+		});
+		
+		return salesVolumes;
+	}
 }

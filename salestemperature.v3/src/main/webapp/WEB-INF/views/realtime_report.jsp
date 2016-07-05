@@ -52,7 +52,11 @@
 
 		var funcChooseProductItem;
 		
-		//
+		var date_of_today;
+		var funcGetProportionOfProducts;
+		var funcGetProportionOfCategories;
+		
+		//////////////////////////////////////////////////////////////////////////////////////////////
 		
 		var funcDispCurTransactionDateTime;
 		var funcLeadingZeros;
@@ -62,17 +66,18 @@
 		var funcPollingRealTimeBaseSalesData;
 		
 		var funcGetTodayDate;
-		var timeBaseCompareDataArr;
 
 		$(document).ready(function(){
-			func_btn_test_postit = function(){
-				alert('OK');
-			}
-			 
+			
+			var dataArr_donut_chart_of_categories = [];
+			var dataArr_donut_chart_of_products = [];
+			var dataArr_timeBase_sales_diff = [];
+			
 			funcGetTodayDate = function(){
 				var dateObj = new Date();
 				var tr_date = dateObj.getFullYear() + "-" + funcLeadingZeros((dateObj.getMonth()+1),2) + "-" + funcLeadingZeros(dateObj.getDate(),2);
 				$("#today_date_caption").text(tr_date);
+				date_of_today = tr_date;
 			}
 			
 			funcPollingRealTimeBaseSalesData = function(){
@@ -80,14 +85,34 @@
 	        	 var dateObj = new Date();
 				 var tr_date = dateObj.getFullYear() + "-" + funcLeadingZeros((dateObj.getMonth()+1),2) + "-" + funcLeadingZeros(dateObj.getDate(),2);
 				
-				
 	             $.ajax({
 	                    type: "GET",
 	                    dataType: "json",
 	                    contentType: "application/json",
-	                    url: "/salest_dashbd/web/get_timebase_data_on_today_specific_date/" + tr_date,
+	                    url: "/salestemperature.v3/web/realtimesalesvolume/timebaseSalesDiff/" + tr_date,
+	                    beforeSend : function(){
+	                        $('#ProgressModal').modal('show');
+	                    },
 	                    success: function (response) {
 	                    	
+	                    	if(response.itemList.length > 0){
+	                    		
+	                    		dataArr_timeBase_sales_diff.length = 0;
+	                    		
+	                    		for(var itemIdx in response.itemList){
+	                    			var itemObj = new Object();
+	                    			itemObj["H"] = response.itemList[itemIdx].itemName;
+	                    			itemObj["past"] = response.itemList[itemIdx].totalSalesAmount;
+	                    			itemObj["today"] = 0;
+	                    			
+	                    			dataArr_timeBase_sales_diff.push(itemObj);
+	                    		}
+	                    		
+		   						bar_chart.setData(dataArr_timeBase_sales_diff);
+	    						bar_chart.redraw();
+	                    	}
+	                    	
+	                    	/*
 	                    	var jsonObj = $.parseJSON(response);
 	                        
 	                    	$.each(jsonObj, function(key, value){
@@ -100,11 +125,12 @@
 		        					}
 		        				})
 	                    	});
-	                    	
-	   						bar_chart.setData(timeBaseCompareDataArr);
-    						bar_chart.redraw();
+	                    	*/
+    						
+	                    	$('#ProgressModal').modal('hide');
                  		},
                  		error: function () {
+                 			$('#ProgressModal').modal('hide');
                      		alert("Error loading data! Please try again.");
                  		}	
 				});
@@ -112,7 +138,7 @@
 			
 			var bar_chart = Morris.Bar({
 		        element: 'hourly-sales-compare-chart',
-		        data: timeBaseCompareDataArr,
+		        data: dataArr_timeBase_sales_diff,
 		        xkey: 'H',
 		        ykeys: ['past','today'],
 		        labels: ['past','today'],
@@ -120,7 +146,95 @@
 		        resize: true
 		    });
 			
+			var donut_chart_of_categories = Morris.Donut({
+		        element: 'total-amount-of-categories-chart',
+		        data: [{
+		            label: "No valid data",
+		            value: 0
+		        }],
+				formatter: function (x) { return x + "%"},
+		        resize: true
+		    });
 			
+			var donut_chart_of_products = Morris.Donut({
+		        element: 'total-amount-of-products-chart',
+		        data: [{
+		            label: "No valid data",
+		            value: 0
+		        }],
+		        colors: ['#0BA462','#39B580','#67C69D','#95D7BB','#0BA462','#39B580','#67C69D','#95D7BB','#0BA462','#39B580'],
+				formatter: function (x) { return x + "%"},
+		        resize: true
+		    });
+			
+			funcGetProportionOfCategories = function(date){
+				
+	             $.ajax({
+	                    type: "GET",
+	                    dataType: "json",
+	                    contentType: "application/json",
+	                    url: "/salestemperature.v3/web/realtimesalesvolume/saleslog_totalamount_of/category_of/" + date,
+	                    success: function (response) {	      
+	                    	
+	                    	if(response.length>0){
+		                    	dataArr_donut_chart_of_categories.length = 0;                    	
+		                    	var categoriesSalesProportion = [];
+		                    	
+		                    	for(var itemIdx in response){
+		                    		var productObj = new Object();
+		                    		productObj["label"] = response[itemIdx].itemName;
+		                    		productObj["value"] = response[itemIdx].percentage;
+		                    		//alert(response[itemIdx].itemName + ": " + response[itemIdx].percentage);
+		                    		categoriesSalesProportion.push(productObj);
+		                    	}
+	
+		                    	dataArr_donut_chart_of_categories = $.extend(true, [], categoriesSalesProportion);
+		                    	donut_chart_of_categories.setData(dataArr_donut_chart_of_categories);
+		                    	donut_chart_of_categories.redraw();
+		                    	
+		                    	funcGetProportionOfProducts(date_of_today);
+	                    	}
+	                    },
+	                    error: function () {
+	                        alert("Error loading data! Please try again.");
+	                    }	
+	                });
+			}
+			
+			funcGetProportionOfProducts = function(date){
+				
+	             $.ajax({
+	                    type: "GET",
+	                    dataType: "json",
+	                    contentType: "application/json",
+	                    url: "/salestemperature.v3/web/realtimesalesvolume/saleslog_totalamount_of/product_of/" + date,
+	                    success: function (response) {
+	                    	
+	                    	if(response.length>0){
+		                    	dataArr_donut_chart_of_products.length = 0;                    	
+		                    	var productsSalesProportion = [];
+		                    	
+		                    	for(var itemIdx in response){
+		                    		var productObj = new Object();
+		                    		productObj["label"] = response[itemIdx].itemName;
+		                    		productObj["value"] = response[itemIdx].percentage;
+		                    		//alert(response[itemIdx].itemName + ": " + response[itemIdx].percentage);
+		                    		productsSalesProportion.push(productObj);
+		                    	}
+
+		                    	dataArr_donut_chart_of_products = $.extend(true, [], productsSalesProportion);
+		                    	donut_chart_of_products.setData(dataArr_donut_chart_of_products);
+		                    	donut_chart_of_products.redraw();
+		                    	
+		                    	funcPollingRealTimeBaseSalesData();
+	                    	}
+	                    },
+	                    error: function () {
+	                        alert("Error loading data! Please try again.");
+	                    }	
+	                });
+			}
+
 			funcGetTimebaseDataOnSpecificDate = function(date){
 				
 	             $.ajax({
@@ -232,6 +346,8 @@
 	 					});
 	                      
 						$('#ProgressModal').modal('hide');
+						
+						funcGetProportionOfCategories(date_of_today);					
 					},
 	        		error: function () {
                         $('#ProgressModal').modal('hide');
@@ -310,11 +426,6 @@
         $(window).load(function(){
         	funcGetTodayDate();
         	funcGetProductCategory();
-        	
-        	//var dateObj = new Date();
-			//var tr_date = dateObj.getFullYear() + "-" + funcLeadingZeros((dateObj.getMonth()+1),2) + "-" + funcLeadingZeros(dateObj.getDate(),2);
-			
-        	//funcGetTimebaseDataOnSpecificDate(tr_date);
         })
 		
 	</script>
@@ -382,7 +493,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{% url 'salest_dashbd.views.index' %}">Sales Temperature 2.0</a>
+                <a class="navbar-brand" href="{% url 'salest_dashbd.views.index' %}">Sales Temperature 3.0</a>
             </div>
             <!-- /.navbar-header -->
 
@@ -393,7 +504,7 @@
                             <a href="/salestemperature.v3/web/stats_report"><i class="fa fa-calendar fa-fw"></i> Annual Stats Report</a>
                         </li>
                         <li>
-                            <a href="/salestemperature.v3/web/realtime_report"><i class="fa fa-bolt fa-fw"></i> Realtime Sales Analysis</a>
+                            <a href="/salestemperature.v3/web/realtime_report"><i class="fa fa-bolt fa-fw"></i> Today's Sales Analysis</a>
                         </li>
                         <li>
                         	<div class="panel panel-primary" style='width: 80%; object-fit: contain; margin:auto; margin-top:20px; margin-bottom:20px;'>
@@ -432,7 +543,7 @@
                     <h1 class="page-header">
                     	<table width="100%">
                     		<tr>
-                    			<td>Realtime Sales Analysis</td>
+                    			<td>Today's Realtime Sales Analysis</td>
                     			<td align="right"><small></small></td>
 	                    		<td align="right">
 									<div class="btn-group">
@@ -550,7 +661,38 @@
                     </div>
                 </div>
             </div>
-            
+
+			<!-- /.row -->
+			<!--
+            <div class="row">
+                <div class="col-lg-12">
+					<div class="panel-body">
+						<div id="per-product-category-sales-volume-chart"></div>
+					</div>
+				</div>
+ 			</div>
+ 			-->
+ 			             
+			<!-- /.row -->
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="panel panel-default">  
+						<div class="panel-heading">Total sales amount Per Catogory</div>
+						<div class="panel-body">
+                            <div id="total-amount-of-categories-chart"></div>
+                        </div>
+					</div>
+				</div>
+				<div class="col-lg-6">
+                    <div class="panel panel-default">  
+						<div class="panel-heading">Total sales amount Per Product</div>
+						<div class="panel-body">
+                            <div id="total-amount-of-products-chart"></div>
+                        </div>
+					</div>
+				</div>
+			</div>
+			             
             <!-- /.row -->
             <div class="row">
 

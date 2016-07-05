@@ -72,8 +72,6 @@ public class SalesVolumeDao {
 		}
 	};
 	
-	
-	
 	public List<SalesVolume> listingMonthlySalesVolume(String queryYear){
 		
 		String queryStr = "SELECT tr_date, SUM(num_of_product) AS num_of_product, (SUM(sales_amount)/10000) AS total_amount " +
@@ -150,4 +148,15 @@ public class SalesVolumeDao {
 
 		return this.jdbcTemplate.query(queryStr, salesVolumeListMapperByDayOfWeekOfMonth);
 	}
+	
+	public List<SalesVolume> listingTimebaseSalesVolumeOfDate(String queryYearMonthDay){
+		
+		String queryStr =
+			"SELECT tr_date, tr_time, SUM(num_of_product) as total_count, SUM(sales_amount) as total_amount FROM (" +
+				"SELECT SUBSTR(date_receipt_num,1,10) AS tr_date, SUBSTR(tr_time,1,2) AS tr_time, num_of_product, sales_amount FROM ext_tr_receipt WHERE SUBSTR(date_receipt_num,1,10) =" + "'" + queryYearMonthDay + "'" +
+			") view_tr_timebase_of_month GROUP BY view_tr_timebase_of_month.tr_time, tr_date ORDER BY tr_time ASC";
+
+		return this.jdbcTemplate.query(queryStr, salesVolumeListMapperByTimebaseOfMonth);
+	}
+	
 }

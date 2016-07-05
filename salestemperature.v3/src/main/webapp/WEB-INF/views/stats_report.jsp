@@ -82,7 +82,6 @@
 			    { nameOfMonth : "Nov.", numOfMonth : "11"},
 			    { nameOfMonth : "Dec.", numOfMonth : "12"}
 			];
-
 			var menuCategoryItems = [];
 			
 			var dataArr_PerProductCateSalesVolume = [];
@@ -167,7 +166,6 @@
                         $('#myModal').modal('show');
                     },
                     success: function (response) {
-
                         var num_of_product = response.totalSalesCount;
                         var total_of_amount = parseInt(response.totalSalesAmount / 10000)
                         var avrg_sales_count = response.avrgSalesCount;
@@ -187,7 +185,6 @@
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // [END] - Annual Summary of Sales Volume
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // [STRAT] - SalesVolume By Categories/Products
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -205,7 +202,6 @@
 	            $("#menu_cate_items_list").append("<li><a href='#' onclick='funcLoadCategoriesSalesVolumeData();return false;'>All</a></li>");
 			
 			}
-
             funcLoadCategoriesSalesVolumeData = function(){
                 
                 $.ajax({
@@ -238,9 +234,7 @@
                         
                         keyArr_PerProductCateSalesVolume = $.extend(true, [], Object.keys(annualSalesAmount[0]));
                         keyArr_PerProductCateSalesVolume = keyArr_PerProductCateSalesVolume.slice(1,keyArr_PerProductCateSalesVolume.length)	// first 'date' item should be removed
-
                         dataArr_PerProductCateSalesVolume = $.extend(true, [], annualSalesAmount);
-
                         area_chart.options.labels = keyArr_PerProductCateSalesVolume;
                         area_chart.options.ykeys = keyArr_PerProductCateSalesVolume;
                         area_chart.setData(dataArr_PerProductCateSalesVolume);
@@ -256,7 +250,6 @@
                     }	
                 });
             }	
-
             funcLoadProductsSalesVolumeData = function(element){
                 
             	var selCategoryName = $(element).text();
@@ -292,9 +285,7 @@
                         
                         keyArr_PerProductCateSalesVolume = $.extend(true, [], Object.keys(annualSalesAmount[0]));
                         keyArr_PerProductCateSalesVolume = keyArr_PerProductCateSalesVolume.slice(1,keyArr_PerProductCateSalesVolume.length)	// first 'date' item should be removed
-
                         dataArr_PerProductCateSalesVolume = $.extend(true, [], annualSalesAmount);
-
                         area_chart.options.labels = keyArr_PerProductCateSalesVolume;
                         area_chart.options.ykeys = keyArr_PerProductCateSalesVolume;
                         area_chart.setData(dataArr_PerProductCateSalesVolume);
@@ -380,7 +371,6 @@
 					funcLoadDayOfWeekSalesVolumeData(curSelectYear, $(element).text());
 				}
 			}
-
 			funcLoadDayOfWeekSalesVolumeData = function(year,monthName){
 				
 				 var numOfMonthObj = getNumOfMonthByNameOfMonth(month_keys_dict, monthName);
