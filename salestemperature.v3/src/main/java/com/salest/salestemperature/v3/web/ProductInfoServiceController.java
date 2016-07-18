@@ -1,9 +1,7 @@
 package com.salest.salestemperature.v3.web;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import com.salest.salestemperature.v3.api.model.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.salest.salestemperature.v3.model.Product;
 import com.salest.salestemperature.v3.service.ProductsInfoService;
+import com.salest.salestemperature.v3.web.request.model.ProductDetailResponse;
 
 @Controller
 @RequestMapping(value="/productinfo")
@@ -27,12 +26,9 @@ public class ProductInfoServiceController {
 	@RequestMapping(value="/get_products_category", method=RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<?> getProductsCategory(){
+		
 		List<String> responseItems = productsInfoService.getProductCategoriesInfo();
-		/*
-		for(String item : responseItems){
-			System.out.println("[getProductsCategory]: " + item);
-		}
-		*/
+
 		if(responseItems!=null && responseItems.size()>0){
 			return new ResponseEntity<List<String>>(responseItems, HttpStatus.OK);
 		} else {

@@ -2,12 +2,7 @@ package com.salest.salestemperature.v3.web;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.salest.salestemperature.v3.api.model.AnnualSalesVolumeSummary;
-import com.salest.salestemperature.v3.api.model.SalesVolumeResponse;
 import com.salest.salestemperature.v3.model.SalesVolume;
 import com.salest.salestemperature.v3.service.AnalyzeSalesVolumeService;
+import com.salest.salestemperature.v3.web.request.model.AnnualSalesVolumeSummary;
+import com.salest.salestemperature.v3.web.request.model.SalesVolumeResponse;
 
 @Controller
 @RequestMapping(value="/salesvolume")
@@ -148,12 +143,19 @@ public class SalesVolumeServiceController {
 		
 		SalesVolumeResponse responseItems = new SalesVolumeResponse(dateYearMonthKey);
 		
-		for(SalesVolume salesVolume : itemSalesVolumes){
-			responseItems.addItemList(
-					new SalesVolumeResponse.ItemDetail(salesVolume.getOptItemName(), salesVolume.getTotalSalesCount(), salesVolume.getTotalSalesAmount()));
+		if(itemSalesVolumes.size()>0){
+			for(SalesVolume salesVolume : itemSalesVolumes){
+				responseItems.addItemList(
+						new SalesVolumeResponse.ItemDetail(salesVolume.getOptItemName(), salesVolume.getTotalSalesCount(), salesVolume.getTotalSalesAmount()));
+			}
+		} else {
+			for(int monthIdx = 10 ; monthIdx < 24; monthIdx++){
+				responseItems.addItemList(
+						new SalesVolumeResponse.ItemDetail(String.format("%02d", monthIdx),0,0L));
+			}
 		}
 		
-		if(itemSalesVolumes.size()>0){
+		if(responseItems.getItemList().size()>0){
 			return new ResponseEntity<SalesVolumeResponse>(responseItems, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -170,12 +172,22 @@ public class SalesVolumeServiceController {
 		
 		SalesVolumeResponse responseItems = new SalesVolumeResponse(dateYearMonthKey);
 		
-		for(SalesVolume salesVolume : itemSalesVolumes){
-			responseItems.addItemList(
-					new SalesVolumeResponse.ItemDetail(salesVolume.getOptItemName(), salesVolume.getTotalSalesCount(), salesVolume.getTotalSalesAmount()));
-		}
-
 		if(itemSalesVolumes.size()>0){
+			for(SalesVolume salesVolume : itemSalesVolumes){
+				responseItems.addItemList(
+						new SalesVolumeResponse.ItemDetail(salesVolume.getOptItemName(), salesVolume.getTotalSalesCount(), salesVolume.getTotalSalesAmount()));
+			}
+		}
+		else {
+			Map<String,String> weekOfDayMap = analyzeSalesVolumeService.getWeekOfDayMap();
+		
+			for(String mapValue : weekOfDayMap.values()){
+				responseItems.addItemList(
+						new SalesVolumeResponse.ItemDetail(mapValue,0,0L));
+			}
+		}
+		
+		if(responseItems.getItemList().size()>0){
 			return new ResponseEntity<SalesVolumeResponse>(responseItems, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);

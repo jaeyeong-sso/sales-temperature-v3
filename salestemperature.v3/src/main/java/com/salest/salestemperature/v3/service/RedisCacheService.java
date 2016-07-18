@@ -13,6 +13,8 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 public class RedisCacheService {
 	
 	public static String TOTAL_SALES_COUNTER_OF_DAY = "total_sales_counter_of_day:";
+	public static String TOTAL_SALES_AMOUNT_OF_DAY  = "saleslog_totalamount_of:";
+	
 	private static int KEY_EXPIRED_PERIOD = 60*60*24;
 	
 	private JedisPool jedisPool;

@@ -88,7 +88,7 @@ public class DaoTest {
 	
 	//@Test
 	public void getAnnualSalesVolumeTest(){
-		Map<String, Object> mapAnnualSalseVolume = salesVolumeDao.getAnnualSalesVolume("2015");
+		Map<String, Object> mapAnnualSalseVolume = salesVolumeDao.getAnnualSalesVolume("2016");
 		
 		for(String key : mapAnnualSalseVolume.keySet()){
 			System.out.println("[key]:" + key + "		[value]:" + mapAnnualSalseVolume.get(key));
@@ -100,7 +100,7 @@ public class DaoTest {
 	//@Test
 	public void listingMajorProductsOfCategoryTest(){
 		
-		Category category = categoryDao.listingMajorProductsOfCategory("Ŀ��");
+		Category category = categoryDao.listingMajorProductsOfCategory("요거트.스무디");
 		
 		Map<String,Product> productsMap = category.getProductsMap();
 
@@ -108,7 +108,7 @@ public class DaoTest {
 			System.out.println("[key]:" + key + "		[value]:" + productsMap.get(key).toString());
 		}
 		
-		assertEquals(category.getName(), category.getName(), "Ŀ��");
+		assertEquals(category.getName(), category.getName(), "요거트.스무디");
 	}
 	
 	//@Test
@@ -116,15 +116,17 @@ public class DaoTest {
 		List<SalesVolume> categorySalesVolumes = salesVolumeDao.listingCategoriesMonthlySalesVolume("2014");
 		for(SalesVolume salesVolume : categorySalesVolumes){
 			System.out.println(salesVolume.toString());
-		}
+		}	
+		assertTrue(categorySalesVolumes.size() > 1);
 	}
 	
 	//@Test
 	public void listingTimebaseSalesVolumeOfMonth(){
-		List<SalesVolume> salesVolumes = salesVolumeDao.listingTimebaseSalesVolumeOfMonth("2014-09");
+		List<SalesVolume> salesVolumes = salesVolumeDao.listingTimebaseSalesVolumeOfMonth("2015-12");
 		for(SalesVolume salesVolume : salesVolumes){
 			System.out.println(salesVolume.toString());
-		}
+		}	
+		assertTrue(salesVolumes.size() > 1);
 	}
 	
 	//@Test
@@ -133,6 +135,7 @@ public class DaoTest {
 		for(SalesVolume salesVolume : salesVolumes){
 			System.out.println(salesVolume.toString());
 		}
+		assertTrue(salesVolumes.size() > 1);
 	}
 	
 	//@Test
@@ -141,5 +144,6 @@ public class DaoTest {
 		for(SalesVolume salesVolume : salesVolumes){
 			System.out.println(salesVolume.toString());
 		}
+		assertTrue(salesVolumes.size() > 1);
 	}
 }

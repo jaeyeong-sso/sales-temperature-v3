@@ -12,8 +12,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.salest.salestemperature.v3.api.model.AnnualSalesVolumeSummary;
 import com.salest.salestemperature.v3.model.SalesVolume;
+import com.salest.salestemperature.v3.web.request.model.AnnualSalesVolumeSummary;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations="/config/applicationContext.xml")
@@ -37,7 +37,10 @@ public class AnalyzeSalesVolumeServiceTest {
 
 	//@Test
 	public void annualSalesVolumeTest(){
-		AnnualSalesVolumeSummary annualSalesVolumeSummary = analyzeSalesVolumeService.getAnnualSalesVolume("2014");
+		AnnualSalesVolumeSummary annualSalesVolumeSummary = analyzeSalesVolumeService.getAnnualSalesVolume("2015");
+		
+		assertTrue(annualSalesVolumeSummary.getTotalSalesAmount()!=0);
+		assertTrue(annualSalesVolumeSummary.getTotalSalesCount()!=0);
 	}
 	
 	
@@ -46,7 +49,7 @@ public class AnalyzeSalesVolumeServiceTest {
 		
 		List<SalesVolume> listResult;
 		
-		listResult = analyzeSalesVolumeService.getMonthlySalesVolumeByCategories("2014");
+		listResult = analyzeSalesVolumeService.getMonthlySalesVolumeByCategories("2016");
 		
 		System.out.println("\r\n[START] - getMonthlySalesVolumeByCategories - [END]\r\n");
 		
@@ -60,7 +63,7 @@ public class AnalyzeSalesVolumeServiceTest {
 	//@Test
 	public void getMonthlySalesVolumeByProductsTest(){
 		
-		List<SalesVolume> listResult = analyzeSalesVolumeService.getMonthlySalesVolumeByProducts("2014","¶ó¶¼");
+		List<SalesVolume> listResult = analyzeSalesVolumeService.getMonthlySalesVolumeByProducts("2014","ï¿½ï¿½");
 		
 		System.out.println("\r\n[START] - getMonthlySalesVolumeByProductsTest - [END]\r\n");
 		
@@ -75,13 +78,13 @@ public class AnalyzeSalesVolumeServiceTest {
 	
 	//@Test
 	public void getTimebaseSalesVolumeOfMonthTest(){
-		List<SalesVolume> listResult = analyzeSalesVolumeService.getTimebaseSalesVolumeOfMonth("2014-09");
+		List<SalesVolume> listResult = analyzeSalesVolumeService.getTimebaseSalesVolumeOfMonth("2016-07");
 		
 		for(SalesVolume salesVolumeItem : listResult){
 			System.out.println(salesVolumeItem.toString());
 		}
 
-		assertTrue(listResult.size() > 0);
+		assertTrue(listResult.size() >= 0);
 	}
 	
 	//@Test
@@ -92,6 +95,15 @@ public class AnalyzeSalesVolumeServiceTest {
 			System.out.println(salesVolumeItem.toString());
 		}
 	
+		assertTrue(listResult.size() > 0);
+	}
+	
+	//@Test
+	public void getTimebaseSalesVolumeOfTodayTest(){
+		List<SalesVolume> listResult = analyzeSalesVolumeService.getTimebaseSalesVolumeOfToday("2016-07-06");
+		for(SalesVolume salesVolumeItem : listResult){
+			System.out.println(salesVolumeItem.toString());
+		}
 		assertTrue(listResult.size() > 0);
 	}
 }

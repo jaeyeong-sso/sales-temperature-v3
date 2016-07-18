@@ -23,6 +23,10 @@ public class CategoryDao {
 		this.jdbcTemplate = new JdbcTemplate(dataSource.getDataSource());
 	}
 	
+	private void REFRESH_TABLE(){
+		this.jdbcTemplate.execute("REFRESH ext_tr_receipt");
+	}
+	
 	public List<Category> listingAllProductCategory(){
 		
 		String queryStr = 
@@ -56,6 +60,8 @@ public class CategoryDao {
 	
 	public Category listingMajorProductsOfCategory(String categoryName){
 				
+		REFRESH_TABLE();
+		
 		String queryStr = 
 			    "SELECT product_code, product_name, price, SUM(sales_amount) AS total_amount, SUM(num_of_product) AS num_of_product " +
 			    	    "FROM (" +
@@ -63,7 +69,6 @@ public class CategoryDao {
 			    	    ") view_ext_tr_reciept_with_cate_name WHERE sales_amount != 0 AND cate_name = '" + categoryName + "' " +
 			    "GROUP BY product_code, product_name, price " +
 			    "ORDER BY (SUM(sales_amount)) DESC LIMIT 10";
-	
 		
 		List<Product> productsList = this.jdbcTemplate.query(queryStr, new RowMapper<Product>(){
 			public Product mapRow(ResultSet rs,int rowNumber) throws SQLException{

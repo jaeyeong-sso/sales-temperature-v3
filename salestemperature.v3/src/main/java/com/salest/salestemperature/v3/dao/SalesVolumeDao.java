@@ -72,7 +72,13 @@ public class SalesVolumeDao {
 		}
 	};
 	
+	private void REFRESH_TABLE(){
+		this.jdbcTemplate.execute("REFRESH ext_tr_receipt");
+	}
+	
 	public List<SalesVolume> listingMonthlySalesVolume(String queryYear){
+		
+		REFRESH_TABLE();
 		
 		String queryStr = "SELECT tr_date, SUM(num_of_product) AS num_of_product, (SUM(sales_amount)/10000) AS total_amount " +
 		        "FROM ( SELECT SUBSTR(date_receipt_num,1,7) AS tr_date, num_of_product, sales_amount FROM ext_tr_receipt WHERE SUBSTR(date_receipt_num,1,4) = '" + queryYear + "') view_tr_recipt " +
@@ -83,8 +89,10 @@ public class SalesVolumeDao {
 	
 	public Map<String, Object> getAnnualSalesVolume(String queryYear){
 		
+		REFRESH_TABLE();
+		
 		String queryStr = 
-		"SELECT COUNT(tr_date) AS total_num_of_date, SUM(total_num_of_product) AS total_num_of_product, SUM(total_amount) AS total_amount  FROM (" +		
+		"SELECT COUNT(tr_date) AS total_num_of_date, IFNULL(SUM(total_num_of_product),0) AS total_num_of_product, IFNULL(SUM(total_amount),0) AS total_amount  FROM (" +		
 			"SELECT tr_date, SUM(num_of_product) AS total_num_of_product, SUM(sales_amount) AS total_amount " +
 	        "FROM (" +
 	            "SELECT SUBSTR(date_receipt_num,1,10) AS tr_date, num_of_product, sales_amount " +
@@ -98,6 +106,8 @@ public class SalesVolumeDao {
 	
 	
 	public List<SalesVolume> listingCategoriesMonthlySalesVolume(String queryYear){
+		
+		REFRESH_TABLE();
 		
 		String queryStr =     
 		        "SELECT tr_date,cate_name, SUM(num_of_product) AS num_of_product, SUM(sales_amount) AS total_amount FROM (" +
@@ -115,6 +125,8 @@ public class SalesVolumeDao {
 	
 	public List<SalesVolume> listingProductsMonthlySalesVolume(String queryYear, String categoryName){
 		
+		REFRESH_TABLE();
+		
 		String queryStr =  
 		        "SELECT tr_date, product_name, SUM(num_of_product) AS num_of_product, SUM(sales_amount) AS total_amount FROM (" +
 		            "SELECT SUBSTR(date_receipt_num,1,7) AS tr_date,cate_name, product_name, product_code,sales_amount,num_of_product FROM (" +
@@ -131,6 +143,8 @@ public class SalesVolumeDao {
 	
 	public List<SalesVolume> listingTimebaseSalesVolumeOfMonth(String queryYearMonth){
 		
+		REFRESH_TABLE();
+		
 		String queryStr =
 			"SELECT tr_date, tr_time, SUM(num_of_product) as total_count, SUM(sales_amount) as total_amount FROM (" +
 				"SELECT SUBSTR(date_receipt_num,1,7) AS tr_date, SUBSTR(tr_time,1,2) AS tr_time, num_of_product, sales_amount FROM ext_tr_receipt WHERE SUBSTR(date_receipt_num,1,7) =" + "'" + queryYearMonth + "'" +
@@ -141,6 +155,8 @@ public class SalesVolumeDao {
 	
 	public List<SalesVolume> listingDayOfWeekSalesVolumeOfMonth(String queryYearMonth){
 		
+		REFRESH_TABLE();
+		
 		String queryStr =
 			"SELECT day_of_week, tr_year_month, cast((SUM(num_of_product)/COUNT(DISTINCT tr_date)) as INTEGER) AS avrg_total_count, cast((SUM(sales_amount)/COUNT(DISTINCT tr_date)) as BIGINT) AS avrg_total_amount FROM (" +
 				"SELECT SUBSTR(date_receipt_num,1,10) AS tr_date, SUBSTR(date_receipt_num,1,7) AS tr_year_month, DAYOFWEEK(date_receipt_num) AS day_of_week, num_of_product, sales_amount FROM ext_tr_receipt WHERE SUBSTR(date_receipt_num,1,7) =" + "'" + queryYearMonth + "'" +
@@ -150,6 +166,8 @@ public class SalesVolumeDao {
 	}
 	
 	public List<SalesVolume> listingTimebaseSalesVolumeOfDate(String queryYearMonthDay){
+		
+		REFRESH_TABLE();
 		
 		String queryStr =
 			"SELECT tr_date, tr_time, SUM(num_of_product) as total_count, SUM(sales_amount) as total_amount FROM (" +

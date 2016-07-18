@@ -1,4 +1,4 @@
-package com.salest.salestemperature.v3.api.model;
+package com.salest.salestemperature.v3.web.request.model;
 
 public class SalesAmountProportionResponse {
 

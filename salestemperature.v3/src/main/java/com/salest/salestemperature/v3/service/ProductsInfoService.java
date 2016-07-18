@@ -2,6 +2,7 @@ package com.salest.salestemperature.v3.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Provider;
 
@@ -36,9 +37,7 @@ public class ProductsInfoService {
 		
 		List<Category> productsCategories = categoryDao.listingAllProductCategory();
 		
-		// Store Products list to DTO Session Bean
 		productInfoDtoService.extractProductsFromCategories(productsCategories);
-		//System.out.println("getProductCategoriesInfo : " + productInfoDtoService.getTestTimeStamp());
 
 		List<String> categoriesList = new ArrayList<String>();
 		

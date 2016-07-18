@@ -142,7 +142,7 @@
 						
                         $('#myModal').modal('hide');
                     },
-                    error: function () {
+                    error: function ( response ) {
                         $('#myModal').modal('hide');
                         alert("Error loading data! Please try again.");
                     }	
@@ -176,7 +176,7 @@
                         $('#avrg_sales_amount').text(avrg_sales_amount);
                         $('#myModal').modal('hide');
                     },
-                    error: function () {
+                    error: function (response) {
                         $('#myModal').modal('hide');
                         alert("Error loading data! Please try again.");
                     }
@@ -352,7 +352,7 @@
 	                    	
 	                        $('#myModal').modal('hide');
 	                    },
-	                    error: function () {
+	                    error: function ( response ) {
 	                        $('#myModal').modal('hide');
 	                        alert("Error loading data! Please try again.");
 	                    }	
@@ -429,15 +429,17 @@
 				$("#selected_year_caption").html(year_combo_caption);
 				
 				funcLoadDescSalesVolumeData();
+		
 	        	funcLoadMonthlySalesVolumeData();
 	        	funcLoadCategoriesSalesVolumeData();
+	        	
 	        	funcLoadTimeBaseSalesVolumeData(curSelectYear, "Dec.");
 	        	funcLoadDayOfWeekSalesVolumeData(curSelectYear, "Dec.");
     		}
 		})
             
         $(window).load(function(){
-        	funcQueryReportPerYear("2014","12");
+        	funcQueryReportPerYear("2016","07");
         })
 		
 	</script>

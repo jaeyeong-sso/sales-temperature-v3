@@ -51,7 +51,7 @@ public class SalesLogService {
 			String message = String.format("%s-%02d,%s,%s,%d,%d", 
 					transaction_date, salesCounter, transaction_time, targetProduct.getId(), 1, targetProduct.getPrice());
 			
-			System.out.println("[writeSalesLog] : " + message);
+			//System.out.println("[writeSalesLog] : " + message);
 			
 			logger.info(message);
 			

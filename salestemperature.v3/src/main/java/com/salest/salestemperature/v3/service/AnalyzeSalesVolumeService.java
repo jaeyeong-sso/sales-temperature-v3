@@ -11,20 +11,20 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import com.salest.salestemperature.v3.api.model.AnnualSalesVolumeSummary;
 import com.salest.salestemperature.v3.dao.CategoryDao;
 import com.salest.salestemperature.v3.dao.SalesVolumeDao;
 import com.salest.salestemperature.v3.model.Category;
-import com.salest.salestemperature.v3.model.Product;
 import com.salest.salestemperature.v3.model.SalesVolume;
+import com.salest.salestemperature.v3.web.request.model.AnnualSalesVolumeSummary;
 
 
 public class AnalyzeSalesVolumeService {
 	
 	private CategoryDao categoryDao;
 	private SalesVolumeDao salesVolumeDao;
+	
+	private RedisCacheService redisCacheService;
 	
 	private Map<String,String> weekOfDayMap;
 	
@@ -47,24 +47,43 @@ public class AnalyzeSalesVolumeService {
 	public void setSalesVolumeDao(SalesVolumeDao salesVolumeDao){
 		this.salesVolumeDao = salesVolumeDao;
 	}
+	
+	public void setRedisCacheService(RedisCacheService redisCacheService){
+		this.redisCacheService = redisCacheService;
+	}
 
+	public Map<String,String> getWeekOfDayMap(){
+		return weekOfDayMap;
+	}
 	
 	public AnnualSalesVolumeSummary getAnnualSalesVolume(String queryYear){
 		
+		long totalNumOfDate = 0L;
+		long totalNumOfProduct = 0L;
+		long totalAmount = 0L;
+		long avrgSalesCount = 0L;
+		long avrgSalesAmount = 0L;
+		
 		Map<String,Object> mapAnnualSalesVolume = salesVolumeDao.getAnnualSalesVolume(queryYear);
 		
-		long totalNumOfDate = (Long) mapAnnualSalesVolume.get("total_num_of_date");
-		long totalNumOfProduct = (Long) mapAnnualSalesVolume.get("total_num_of_product");
-		long totalAmount = (Long) mapAnnualSalesVolume.get("total_amount");
+		totalNumOfDate = (Long) mapAnnualSalesVolume.get("total_num_of_date");
+		totalNumOfProduct = (Long) mapAnnualSalesVolume.get("total_num_of_product");
+		totalAmount = (Long) mapAnnualSalesVolume.get("total_amount");
+		
+		if(totalNumOfDate!=0){
+			avrgSalesCount = totalNumOfProduct/totalNumOfDate;
+			avrgSalesAmount = totalAmount/totalNumOfDate;
+		}
 		
 		AnnualSalesVolumeSummary annualSalesVolumeSummary = new AnnualSalesVolumeSummary();
 		
 		annualSalesVolumeSummary.setTotalSalesCount((int) totalNumOfProduct);
 		annualSalesVolumeSummary.setTotalSalesAmount(totalAmount);
-		annualSalesVolumeSummary.setAvrgSalesCount((int) (totalNumOfProduct/totalNumOfDate));
-		annualSalesVolumeSummary.setAvrgSalesAmount(totalAmount/totalNumOfDate);
+		annualSalesVolumeSummary.setAvrgSalesCount((int) avrgSalesCount);
+		annualSalesVolumeSummary.setAvrgSalesAmount(avrgSalesAmount);
 		
 		return annualSalesVolumeSummary;
+
 	}
 	
 	public List<SalesVolume> listingMonthlySalesVolume(String queryYear){
@@ -203,6 +222,44 @@ public class AnalyzeSalesVolumeService {
 	
 	public List<SalesVolume> getTimebaseSalesVolumeOfDate(String queryYearMonthDay){
 		List<SalesVolume> salesVolumes = salesVolumeDao.listingTimebaseSalesVolumeOfDate(queryYearMonthDay);
+		
+		SalesVolume findObject = (SalesVolume)CollectionUtils.find(salesVolumes, new org.apache.commons.collections.Predicate() {
+	        public boolean evaluate(Object salesVolume) {
+	            return ((SalesVolume)salesVolume).getOptItemName().equals("00");
+	        }
+	    });
+
+		if(findObject!=null){
+			findObject.setOptItemName("24");
+		}
+		
+		Collections.sort(salesVolumes, new Comparator<SalesVolume>() {
+			public int compare(SalesVolume first, SalesVolume second) {
+				return first.getOptItemName().compareTo(second.getOptItemName());
+			}
+		});
+		
+		return salesVolumes;
+	}
+	
+	
+	public List<SalesVolume> getTimebaseSalesVolumeOfToday(String queryYearMonthDay){
+		
+		List<SalesVolume> salesVolumes = new ArrayList<SalesVolume>();
+		
+		Set<String> targetKeys = redisCacheService.readKeys(RedisCacheService.TOTAL_SALES_AMOUNT_OF_DAY +"timebase_of:"+ queryYearMonthDay +":*");
+		for(String key : targetKeys){
+
+			String[] keyFields = key.split(":");
+			String timeSlot = keyFields[keyFields.length-1];
+			
+			salesVolumes.add(new SalesVolume.SalesVolumeBuilder()
+					.withDate(queryYearMonthDay)
+					.withOptItemName(timeSlot)
+					.withTotalSalesCount(0)
+					.withTotalSalesAmount(Long.parseLong(redisCacheService.readValueByKey(key)))
+					.build());
+		}
 		
 		SalesVolume findObject = (SalesVolume)CollectionUtils.find(salesVolumes, new org.apache.commons.collections.Predicate() {
 	        public boolean evaluate(Object salesVolume) {

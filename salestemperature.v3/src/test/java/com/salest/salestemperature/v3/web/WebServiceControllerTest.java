@@ -93,24 +93,21 @@ public class WebServiceControllerTest {
 			//.andDo(print())
 			.andExpect(status().isOk());
 		
-		/*
 		// [Case #1] Working in the same Session Bean Scope
+
 		this.mockMvc.perform(post("/saleslog/write").session(mocksession_1)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content("{\"product_name\":\"아메리카노\", \"tr_date\":\"2016-06-15\", \"tr_time\":\"15:38:00\"}"))
+				.content("{\"productName\":\"아메리카노\", \"trDate\":\"2016-07-07\", \"trTime\":\"15:38:00\"}"))
 			//.andDo(print())
 			.andExpect(status().isOk());
-		*/
+
 		
-		/*
 		// [Case #2] Working in the different Session Bean Scope
 		this.mockMvc.perform(post("/saleslog/write").session(mocksession_2)
-				.param(PARAM_KEY_PRODUCT_NAME, "아메리카노")
-				.param(PARAM_KEY_TR_DATE, "2016-06-15")
-				.param(PARAM_TR_TIME, "15:39:00"))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"productName\":\"아메리카노\", \"trDate\":\"2016-07-08\", \"trTime\":\"15:38:00\"}"))
 			//.andDo(print())
 			.andExpect(status().isInternalServerError());
-		*/
 	}
 	
 	
@@ -135,13 +132,14 @@ public class WebServiceControllerTest {
 				.andDo(print())
 				.andExpect(status().isOk());
 		
-		this.mockMvc.perform(get("/salesvolume/timebase_sales_vol/" + "2014/12").session(mocksession))
+		this.mockMvc.perform(get("/salesvolume/timebase_sales_vol/" + "2016/12").session(mocksession))
 				.andDo(print())
 				.andExpect(status().isOk());
 
 		this.mockMvc.perform(get("/salesvolume/dayofweek_sales_vol/" + "2014/12").session(mocksession))
 				.andDo(print())
 				.andExpect(status().isOk());
+
 	}
 	
 	
@@ -151,12 +149,13 @@ public class WebServiceControllerTest {
 		MockHttpSession mocksession = new MockHttpSession();
 
 		this.mockMvc.perform(get(new URI("/productinfo/get_products_items/" + "커피")).session(mocksession))
-				.andDo(print())
+				//.andDo(print())
 				.andExpect(status().isOk());
 		
 		
 		// "get_products_category" need to do test with Session Bean Scope
 		
+		/*
 		MockHttpSession mocksession_1 = new MockHttpSession();
 		MockHttpSession mocksession_2 = new MockHttpSession();
 		
@@ -175,6 +174,7 @@ public class WebServiceControllerTest {
 		this.mockMvc.perform(get("/productinfo/get_products_category").session(mocksession_1))
 				.andDo(print())
 				.andExpect(status().isOk());
+		*/
 	}
 		
 	@Test
@@ -182,27 +182,11 @@ public class WebServiceControllerTest {
 		
 		MockHttpSession mocksession = new MockHttpSession();
 		
-		//this.mockMvc.perform(get("/productinfo/get_products_category").session(mocksession)).andExpect(status().isOk());
+		this.mockMvc.perform(get("/productinfo/get_products_category").session(mocksession)).andExpect(status().isOk());
 		
-		/*
-		// By Product
-		this.mockMvc.perform(get("/realtimesalesvolume/saleslog_totalamount_of/product_of/2016-07-04").session(mocksession))
-				.andDo(print())
-				.andExpect(status().isOk());
-		*/
+		this.mockMvc.perform(get("/realtimesalesvolume/todays_stream_data/2016-07-07").session(mocksession))
+			.andDo(print())
+			.andExpect(status().isOk());
 		
-		// By Category
-		/*
-		this.mockMvc.perform(get("/realtimesalesvolume/saleslog_totalamount_of/category_of/2016-07-04").session(mocksession))
-				.andDo(print())
-				.andExpect(status().isOk());
-		*/
-		
-		// Timebase Sales Diff on past specific date
-		this.mockMvc.perform(get("/realtimesalesvolume/timebaseSalesDiff/2016-07-05").session(mocksession))
-				.andDo(print())
-				.andExpect(status().isOk());
-
 	}
-	
 }

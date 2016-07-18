@@ -53,8 +53,12 @@
 		var funcChooseProductItem;
 		
 		var date_of_today;
-		var funcGetProportionOfProducts;
-		var funcGetProportionOfCategories;
+
+		var parseCategoriesProportionData;
+		var parseProductsProportionData;
+		var parseSalesDiffData;
+		
+		var funcGetCachedProportionData;
 		
 		//////////////////////////////////////////////////////////////////////////////////////////////
 		
@@ -62,9 +66,6 @@
 		var funcLeadingZeros;
 		
 		var funcWriteTransactionLog;
-		
-		var funcPollingRealTimeBaseSalesData;
-		
 		var funcGetTodayDate;
 
 		$(document).ready(function(){
@@ -73,68 +74,6 @@
 			var dataArr_donut_chart_of_products = [];
 			var dataArr_timeBase_sales_diff = [];
 			
-			funcGetTodayDate = function(){
-				var dateObj = new Date();
-				var tr_date = dateObj.getFullYear() + "-" + funcLeadingZeros((dateObj.getMonth()+1),2) + "-" + funcLeadingZeros(dateObj.getDate(),2);
-				$("#today_date_caption").text(tr_date);
-				date_of_today = tr_date;
-			}
-			
-			funcPollingRealTimeBaseSalesData = function(){
-				
-	        	 var dateObj = new Date();
-				 var tr_date = dateObj.getFullYear() + "-" + funcLeadingZeros((dateObj.getMonth()+1),2) + "-" + funcLeadingZeros(dateObj.getDate(),2);
-				
-	             $.ajax({
-	                    type: "GET",
-	                    dataType: "json",
-	                    contentType: "application/json",
-	                    url: "/salestemperature.v3/web/realtimesalesvolume/timebaseSalesDiff/" + tr_date,
-	                    beforeSend : function(){
-	                        $('#ProgressModal').modal('show');
-	                    },
-	                    success: function (response) {
-	                    	
-	                    	if(response.itemList.length > 0){
-	                    		
-	                    		dataArr_timeBase_sales_diff.length = 0;
-	                    		
-	                    		for(var itemIdx in response.itemList){
-	                    			var itemObj = new Object();
-	                    			itemObj["H"] = response.itemList[itemIdx].itemName;
-	                    			itemObj["past"] = response.itemList[itemIdx].totalSalesAmount;
-	                    			itemObj["today"] = 0;
-	                    			
-	                    			dataArr_timeBase_sales_diff.push(itemObj);
-	                    		}
-	                    		
-		   						bar_chart.setData(dataArr_timeBase_sales_diff);
-	    						bar_chart.redraw();
-	                    	}
-	                    	
-	                    	/*
-	                    	var jsonObj = $.parseJSON(response);
-	                        
-	                    	$.each(jsonObj, function(key, value){
-	                    		
-		        				$.each(timeBaseCompareDataArr, function(idx,item){
-		        					var jsonObj = JSON.parse(JSON.stringify(item));
-		        					if(jsonObj.H == key){
-		        						jsonObj.today = value;
-		        						timeBaseCompareDataArr[idx] = jsonObj;
-		        					}
-		        				})
-	                    	});
-	                    	*/
-    						
-	                    	$('#ProgressModal').modal('hide');
-                 		},
-                 		error: function () {
-                 			$('#ProgressModal').modal('hide');
-                     		alert("Error loading data! Please try again.");
-                 		}	
-				});
-			}
 			
 			var bar_chart = Morris.Bar({
 		        element: 'hourly-sales-compare-chart',
@@ -162,110 +101,101 @@
 		            label: "No valid data",
 		            value: 0
 		        }],
-		        colors: ['#0BA462','#39B580','#67C69D','#95D7BB','#0BA462','#39B580','#67C69D','#95D7BB','#0BA462','#39B580'],
+		        colors: ['#0BA462','#39B580','#67C69D','#95D7BB'],
 				formatter: function (x) { return x + "%"},
 		        resize: true
 		    });
 			
-			funcGetProportionOfCategories = function(date){
-				
-	             $.ajax({
-	                    type: "GET",
-	                    dataType: "json",
-	                    contentType: "application/json",
-	                    url: "/salestemperature.v3/web/realtimesalesvolume/saleslog_totalamount_of/category_of/" + date,
-	                    success: function (response) {	      
-	                    	
-	                    	if(response.length>0){
-		                    	dataArr_donut_chart_of_categories.length = 0;                    	
-		                    	var categoriesSalesProportion = [];
-		                    	
-		                    	for(var itemIdx in response){
-		                    		var productObj = new Object();
-		                    		productObj["label"] = response[itemIdx].itemName;
-		                    		productObj["value"] = response[itemIdx].percentage;
-		                    		//alert(response[itemIdx].itemName + ": " + response[itemIdx].percentage);
-		                    		categoriesSalesProportion.push(productObj);
-		                    	}
-	
-		                    	dataArr_donut_chart_of_categories = $.extend(true, [], categoriesSalesProportion);
-		                    	donut_chart_of_categories.setData(dataArr_donut_chart_of_categories);
-		                    	donut_chart_of_categories.redraw();
-		                    	
-		                    	funcGetProportionOfProducts(date_of_today);
-	                    	}
-	                    },
-	                    error: function () {
-	                        alert("Error loading data! Please try again.");
-	                    }	
-	                });
+			funcGetTodayDate = function(){
+				var dateObj = new Date();
+				var tr_date = dateObj.getFullYear() + "-" + funcLeadingZeros((dateObj.getMonth()+1),2) + "-" + funcLeadingZeros(dateObj.getDate(),2);
+				$("#today_date_caption").text(tr_date);
+				date_of_today = tr_date;
 			}
 			
-			funcGetProportionOfProducts = function(date){
+			/* "categories":[{"itemName":"","totalAmount":2500,"percentage":100.0}] */
+			parseCategoriesProportionData = function(categories){
 				
-	             $.ajax({
-	                    type: "GET",
-	                    dataType: "json",
-	                    contentType: "application/json",
-	                    url: "/salestemperature.v3/web/realtimesalesvolume/saleslog_totalamount_of/product_of/" + date,
-	                    success: function (response) {
-	                    	
-	                    	if(response.length>0){
-		                    	dataArr_donut_chart_of_products.length = 0;                    	
-		                    	var productsSalesProportion = [];
-		                    	
-		                    	for(var itemIdx in response){
-		                    		var productObj = new Object();
-		                    		productObj["label"] = response[itemIdx].itemName;
-		                    		productObj["value"] = response[itemIdx].percentage;
-		                    		//alert(response[itemIdx].itemName + ": " + response[itemIdx].percentage);
-		                    		productsSalesProportion.push(productObj);
-		                    	}
+            	if(categories.length>0){
+                	dataArr_donut_chart_of_categories.length = 0;                    	
+                	var categoriesSalesProportion = [];
+                	
+                	for(var itemIdx in categories){
+                		var productObj = new Object();
+                		productObj["label"] = categories[itemIdx].itemName;
+                		productObj["value"] = categories[itemIdx].percentage;
+                		//alert(response[itemIdx].itemName + ": " + response[itemIdx].percentage);
+                		categoriesSalesProportion.push(productObj);
+                	}
 
-		                    	dataArr_donut_chart_of_products = $.extend(true, [], productsSalesProportion);
-		                    	donut_chart_of_products.setData(dataArr_donut_chart_of_products);
-		                    	donut_chart_of_products.redraw();
-		                    	
-		                    	funcPollingRealTimeBaseSalesData();
-	                    	}
-	                    },
-	                    error: function () {
-	                        alert("Error loading data! Please try again.");
-	                    }	
-	                });
+                	dataArr_donut_chart_of_categories = $.extend(true, [], categoriesSalesProportion);
+                	donut_chart_of_categories.setData(dataArr_donut_chart_of_categories);
+                	donut_chart_of_categories.redraw();
+            	}
 			}
-
-			funcGetTimebaseDataOnSpecificDate = function(date){
+			
+			/* "products":[{"itemName":"","totalAmount":2500,"percentage":100.0}] */
+			parseProductsProportionData = function(products){
 				
+            	if(products.length>0){
+                	dataArr_donut_chart_of_products.length = 0;                    	
+                	var productsSalesProportion = [];
+                	
+                	for(var itemIdx in products){
+                		var productObj = new Object();
+                		productObj["label"] = products[itemIdx].itemName;
+                		productObj["value"] = products[itemIdx].percentage;
+                		//alert(response[itemIdx].itemName + ": " + response[itemIdx].percentage);
+                		productsSalesProportion.push(productObj);
+                	}
+
+                	dataArr_donut_chart_of_products = $.extend(true, [], productsSalesProportion);
+                	donut_chart_of_products.setData(dataArr_donut_chart_of_products);
+                	donut_chart_of_products.redraw();
+            	}
+			}
+			
+			/* "salesVolumeDiff":{ "date":"2015-07-09","itemList":[{"itemName":"11","pastTotalSalesAmount":10700,"nowTotalSalesAmount":0},{"itemName":"12","pastTotalSalesAmount":9400,"nowTotalSalesAmount":0},{"itemName":"13","pastTotalSalesAmount":5800,"nowTotalSalesAmount":0},{"itemName":"14","pastTotalSalesAmount":33400,"nowTotalSalesAmount":0},{"itemName":"15","pastTotalSalesAmount":9900,"nowTotalSalesAmount":0},{"itemName":"16","pastTotalSalesAmount":7500,"nowTotalSalesAmount":2500},{"itemName":"17","pastTotalSalesAmount":8100,"nowTotalSalesAmount":0},{"itemName":"18","pastTotalSalesAmount":5000,"nowTotalSalesAmount":0},{"itemName":"19","pastTotalSalesAmount":37600,"nowTotalSalesAmount":0},{"itemName":"20","pastTotalSalesAmount":24500,"nowTotalSalesAmount":0},{"itemName":"21","pastTotalSalesAmount":23000,"nowTotalSalesAmount":0},{"itemName":"22","pastTotalSalesAmount":5000,"nowTotalSalesAmount":0}]"}" */
+			parseSalesDiffData = function(salesVolumeDiff){
+            	if(salesVolumeDiff.itemList.length > 0){
+            		
+            		dataArr_timeBase_sales_diff.length = 0;
+            		
+            		for(var itemIdx in salesVolumeDiff.itemList){
+            			var itemObj = new Object();
+            			itemObj["H"] = salesVolumeDiff.itemList[itemIdx].itemName;
+            			itemObj["past"] = salesVolumeDiff.itemList[itemIdx].pastTotalSalesAmount;
+            			itemObj["today"] = salesVolumeDiff.itemList[itemIdx].nowTotalSalesAmount;
+            			
+            			dataArr_timeBase_sales_diff.push(itemObj);
+            		}
+            		
+            		$('#past_date').text(salesVolumeDiff.date);
+            		
+					bar_chart.setData(dataArr_timeBase_sales_diff);
+					bar_chart.redraw();
+            	}
+			}
+			
+			funcGetCachedProportionData = function(date_of_today){
+
 	             $.ajax({
 	                    type: "GET",
 	                    dataType: "json",
 	                    contentType: "application/json",
-	                    url: "/salest_dashbd/web/get_timebase_data_on_past_specific_date/" + date,
-	                    beforeSend : function(){
-	                        $('#ProgressModal').modal('show');
-	                    },
-	                    success: function (response) {
-	                        var jsonObj = $.parseJSON(response);
-	
-	                        timeBaseCompareDataArr.length = 0;
-	                        
-							$.each(jsonObj, function(key, value){
-								
-							   $('#past_date').text(key + " 대비");
-							   
-							   timeBaseCompareDataArr = $.extend(true, [], jsonObj[key]);			 
-							});
-							bar_chart.setData(timeBaseCompareDataArr);
-							bar_chart.redraw();
-							
-	                        $('#ProgressModal').modal('hide');
+	                    url: "/salestemperature.v3/web/realtimesalesvolume/todays_stream_data/"+ date_of_today,
+	                    success: function (response) {	      
+	                    	parseCategoriesProportionData(response.categories);
+	                    	parseProductsProportionData(response.products);
+	                    	parseSalesDiffData(response.salesVolumeDiff);
+	                    	
+	                    	$('#ProgressModal').modal('hide');
 	                    },
 	                    error: function () {
-	                        $('#ProgressModal').modal('hide');
+	                    	$('#ProgressModal').modal('hide');
 	                        alert("Error loading data! Please try again.");
-	                    }	
-	                });
+	                    }
+	             });
 			}
 			
 			funcEvalProductSelectionState = function(product_name, tr_date, tr_time){
@@ -301,11 +231,12 @@
 				if( funcEvalProductSelectionState(product_name, tr_date, tr_time) == false){
 					return;
 				}
+				
 				var jsonParams = "{\"productName\":\"" + product_name + 
 					"\",\"trDate\":\"" + tr_date +
 					"\",\"trTime\":\"" + tr_time +  "\"}";
-				
-					$.ajax({
+					
+				$.ajax({
 						type: "POST",
 						data: jsonParams,
 						contentType: 'application/json; charset=UTF-8',
@@ -315,16 +246,14 @@
 	                        $('#ProgressModal').modal('show');
 	                    },
 						success: function (response) {
-							
-							//setTimeout(funcPollingRealTimeBaseSalesData(),3000);
-				        	
-							$('#ProgressModal').modal('hide');
+							//$('#ProgressModal').modal('hide');						
+							setTimeout(funcGetCachedProportionData(date_of_today),5000);
 						}, 
 						error: function (response) {
 	                        $('#ProgressModal').modal('hide');
-							//alert("Error loading data! Please try again.");
+							alert("Error loading data! Please try again.");
 						}
-					});
+				});
 			}
 			
 			funcGetProductCategory = function(){
@@ -338,16 +267,16 @@
                         $('#ProgressModal').modal('show');
                     },
 					success: function (response) {
-			
+		
 						$("#menu_cate_items_list").children().remove();
 	                        
 						$.each(response, function(key, value){
 	                    	$("#menu_cate_items_list").append("<li><a href='#' onclick='funcGetMostPopularProducts(this);return false;'>" + value + "</a></li>");
 	 					});
 	                      
-						$('#ProgressModal').modal('hide');
+						//$('#ProgressModal').modal('hide');			
 						
-						funcGetProportionOfCategories(date_of_today);					
+						funcGetCachedProportionData(date_of_today);
 					},
 	        		error: function () {
                         $('#ProgressModal').modal('hide');
@@ -377,6 +306,7 @@
 						for(var productItemIdx in productsDetailsJsonObj){
 							$("#product_items_list").append("<li><a href='#' onclick='funcChooseProductItem(this);return false;'>" + productsDetailsJsonObj[productItemIdx].name + "</a></li>");
 						}
+						$("#choose_product_caption").text("Product");
 	                      
 						$('#ProgressModal').modal('hide');
 					},
@@ -409,7 +339,6 @@
 				
 				$("#transaction_date").val(tr_date);
 				$("#transaction_time").val(tr_time);
-				
 			}
 			
 			funcLeadingZeros = function(n, digits) {
@@ -543,7 +472,7 @@
                     <h1 class="page-header">
                     	<table width="100%">
                     		<tr>
-                    			<td>Today's Realtime Sales Analysis</td>
+                    			<td>Today's Realtime Sales Log Analysis</td>
                     			<td align="right"><small></small></td>
 	                    		<td align="right">
 									<div class="btn-group">
@@ -677,7 +606,7 @@
             <div class="row">
                 <div class="col-lg-6">
                     <div class="panel panel-default">  
-						<div class="panel-heading">Total sales amount Per Catogory</div>
+						<div class="panel-heading">Total amount Proportion Per Catogory</div>
 						<div class="panel-body">
                             <div id="total-amount-of-categories-chart"></div>
                         </div>
@@ -685,7 +614,7 @@
 				</div>
 				<div class="col-lg-6">
                     <div class="panel panel-default">  
-						<div class="panel-heading">Total sales amount Per Product</div>
+						<div class="panel-heading">Total amount Proportion Per Product</div>
 						<div class="panel-body">
                             <div id="total-amount-of-products-chart"></div>
                         </div>
@@ -699,7 +628,7 @@
                 <div class="col-lg-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                        Comparison Timebase-Sales Amount with the past time ( Month/X-th Week/Week Of Day ).
+                        Similar day last year VS Today time-based sales amount comparison.
                             <span id="past_date" style='float:right'></span>
                         </div>
                         <!-- /.panel-heading -->
