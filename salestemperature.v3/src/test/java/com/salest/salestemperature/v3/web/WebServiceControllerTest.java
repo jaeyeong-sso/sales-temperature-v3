@@ -181,7 +181,7 @@ public class WebServiceControllerTest {
 		*/
 	}
 		
-	@Test
+	//@Test
 	public void realtimeSalesVolumeServiceControllerTest() throws Exception{
 		
 		MockHttpSession mocksession = new MockHttpSession();

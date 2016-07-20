@@ -2,29 +2,26 @@
 
 <p> Re-development "sales-temperature-v2" with Spring Framework </p>
 
-<p> [Goal of this project] </p>
+<p> [Implementation Goal of this project] </p>
 <p>
 1. Replace with proper component for Impala / Redis </br>
    : Remove python-specific-background process layer - Celery </br>
-   : Query with JDBCTemplate
+   : Query with JDBCTemplate base on ImpalaJDBC connector.
 </p>
 <p>
-2. TDD oriented development with JUnit </br>
-   : Jersey Test Framework / Spring D
-   : Not only Unit Test but also Integration Test(with Jersey Test Framework / Spring-mvc-test(MockMvc))
+2. Impala Query Enhancement with "User Defined Aggregate Function" implementation.</br>
+   : To reduce sub-query <br>
+   : To replace expensive Impala Built-in function usage.
 </p>
 <p>
-3. Considering proper Design Pattern - eg. Template/Callback, Proxy, AOP </br>
-   : [TBD] Redis cache business logic with AOP.
+3. Adaptation enhanced implementation : Kafka Message - Spark Streaming processing.
+   : Realtime analysis approximately under 5 sec(batch-interval)
 </p>
-<p>
-4. Imagine the diifferent owner for each technical layer </br>
-   : eg. person #1 taking charge of implementing Redis Data Cache logic </br>
-         person #2 taking charge of impelmenting Data Analysis logic with Impala query </br>
-         person #3 taking cahrge of implementing standard 3-tier(Service/Dao/Template(View)) layer </br>
-</p>
-<p>
-5. Adaptation enhanced implementation : Kafka-Spark processing concept
-</p>
-6. Considering Bean Scope base DTO(exactly not) usage purpose. </br>
+4. Considering DAO result(by Impala Query) reusing in application business logic.
+   : Utilizing Session Bean Scope instead of DTO</br>
    : Need to do Session Bean Scope integration testing
+   : To implement Web Service, use Spring-MVC instead of Jersey - Jersey dose not support "Session Bean Scope" of Spring.
+<p>
+5. TDD oriented development with JUnit </br>
+   : Not only Unit Test but also Integration Test(Spring-mvc-test(MockMvc))
+</p>

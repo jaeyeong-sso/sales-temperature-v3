@@ -54,9 +54,9 @@ public class SalesVolumeDao {
 	private RowMapper<SalesVolume> salesVolumeListMapperByTimebaseOfMonth = new RowMapper<SalesVolume>(){
 		public SalesVolume mapRow(ResultSet rs,int rowNumber) throws SQLException{
 			return new SalesVolume.SalesVolumeBuilder()
-					.withDate(rs.getString("tr_date"))
+					.withDate("")
 					.withOptItemName(rs.getString("tr_time"))
-					.withTotalSalesCount(rs.getInt("total_count"))
+					.withTotalSalesCount(0)
 					.withTotalSalesAmount(rs.getLong("total_amount"))
 					.build();
 		}
@@ -147,10 +147,18 @@ public class SalesVolumeDao {
 		REFRESH_TABLE();
 		
 		String queryStr =
+			"SELECT tr_time, avg_sales_volume(sales_amount,CAST(tr_date_day AS INTEGER)) AS total_amount " +
+			"FROM (" +
+				"SELECT SUBSTR(date_receipt_num,9,2) AS tr_date_day, SUBSTR(tr_time,1,2) AS tr_time, sales_amount " +
+				"FROM ext_tr_receipt WHERE SUBSTR(date_receipt_num,1,7) = " + "'" + queryYearMonth + "'" + ") view_of_month " + 
+				"GROUP BY view_of_month.tr_time ORDER BY view_of_month.tr_time";
+
+			/*
 			"SELECT tr_date, tr_time, SUM(num_of_product) as total_count, SUM(sales_amount) as total_amount FROM (" +
 				"SELECT SUBSTR(date_receipt_num,1,7) AS tr_date, SUBSTR(tr_time,1,2) AS tr_time, num_of_product, sales_amount FROM ext_tr_receipt WHERE SUBSTR(date_receipt_num,1,7) =" + "'" + queryYearMonth + "'" +
 			") view_tr_timebase_of_month GROUP BY view_tr_timebase_of_month.tr_time, tr_date ORDER BY tr_time ASC";
-
+			*/
+				
 		return this.jdbcTemplate.query(queryStr, salesVolumeListMapperByTimebaseOfMonth);
 	}
 	

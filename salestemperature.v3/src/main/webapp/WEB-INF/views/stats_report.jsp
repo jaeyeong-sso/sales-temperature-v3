@@ -203,7 +203,9 @@
 			
 			}
             funcLoadCategoriesSalesVolumeData = function(){
-                
+            	
+				$("#menu_cate_items_caption").text("All");
+				
                 $.ajax({
                     type: "GET",
                     dataType: "json",
@@ -347,7 +349,7 @@
 									'</span></a>';
 	                            
 	                            $("#list_timebase_sales_amount").append(strHtmlItem);
-	                            $(timeSlotItemId).css("width", Math.round(parseInt(totalSalesAmount)/10000) +"px");
+	                            $(timeSlotItemId).css("width", Math.round(parseInt(totalSalesAmount)/200) +"px");
 	                    	}
 	                    	
 	                        $('#myModal').modal('hide');
@@ -404,7 +406,7 @@
 	                            
 	                            $("#list_weekofday_sales_amount").append(strHtmlItem);
 	                            $(key).css("width", "500px");
-	                            $(itemId).css("width", Math.round(parseInt(totalSalesAmount)/2000) +"px");
+	                            $(itemId).css("width", Math.round(parseInt(totalSalesAmount)/3000) +"px");
 	                    	}
 	                    	
 	                        $('#myModal').modal('hide');
@@ -686,7 +688,7 @@
                     <!-- /.panel -->
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <i class="fa fa-glass fa-fw"></i> Sales contribution per menu
+                            <i class="fa fa-glass fa-fw"></i> Sales contribution per product.
                             <div class="pull-right">
    								<div class="btn-group">
                                     <button id="menu_cate_items_caption" type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
