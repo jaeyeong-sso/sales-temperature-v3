@@ -14,13 +14,15 @@
    : To replace expensive Impala Built-in function usage.
 </p>
 <p>
-3. Adaptation enhanced implementation : Kafka Message - Spark Streaming processing.
+3. Adaptation enhanced implementation : Kafka Message - Spark Streaming processing. </br>
    : Realtime analysis approximately under 5 sec(batch-interval)
 </p>
-4. Considering DAO result(by Impala Query) reusing in application business logic.
+<p>
+4. Considering DAO result(by Impala Query) reusing in application business logic. </br>
    : Utilizing Session Bean Scope instead of DTO</br>
-   : Need to do Session Bean Scope integration testing
+   : Need to do Session Bean Scope integration testing </br>
    : To implement Web Service, use Spring-MVC instead of Jersey - Jersey dose not support "Session Bean Scope" of Spring.
+</p>
 <p>
 5. TDD oriented development with JUnit </br>
    : Not only Unit Test but also Integration Test(Spring-mvc-test(MockMvc))
