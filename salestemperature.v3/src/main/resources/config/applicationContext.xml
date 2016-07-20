@@ -30,7 +30,7 @@
 	</bean>
 	
 	
-	<bean id="popularProductsService" class="com.salest.salestemperature.v3.service.AnalyzeSalesVolumeService">
+	<bean id="analyzeSalesVolumeService" class="com.salest.salestemperature.v3.service.AnalyzeSalesVolumeService">
 		<property name="categoryDao" ref="categoryDao" />
 		<property name="salesVolumeDao" ref="salesVolumeDao" />
 		<property name="redisCacheService" ref="redisCacheService" />
@@ -38,6 +38,7 @@
 		
 	<bean id="productsInfoService" class="com.salest.salestemperature.v3.service.ProductsInfoService">
 		<property name="categoryDao" ref="categoryDao" />
+		<property name="redisCacheService" ref="redisCacheService" />
 	</bean>
 		
 	<bean id="salesLogService" class="com.salest.salestemperature.v3.service.SalesLogService">

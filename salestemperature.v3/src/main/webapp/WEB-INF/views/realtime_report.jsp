@@ -67,7 +67,9 @@
 		
 		var funcWriteTransactionLog;
 		var funcGetTodayDate;
-
+		
+		var funcSleep;
+		
 		$(document).ready(function(){
 			
 			var dataArr_donut_chart_of_categories = [];
@@ -246,8 +248,9 @@
 	                        $('#ProgressModal').modal('show');
 	                    },
 						success: function (response) {
-							//$('#ProgressModal').modal('hide');						
-							setTimeout(funcGetCachedProportionData(date_of_today),5000);
+							//$('#ProgressModal').modal('hide');
+							funcSleep(5000);
+							funcGetCachedProportionData(date_of_today);
 						}, 
 						error: function (response) {
 	                        $('#ProgressModal').modal('hide');
@@ -349,6 +352,15 @@
 				      zero += '0';
 				  }
 				  return zero + n;
+			}
+			
+			funcSleep = function(num){	// 1/1000 sec 
+				var now = new Date();
+				var stop = now.getTime() + num;
+				while(true){
+					now = new Date();
+					if(now.getTime() > stop)return;
+				}
 			}
 		})
             

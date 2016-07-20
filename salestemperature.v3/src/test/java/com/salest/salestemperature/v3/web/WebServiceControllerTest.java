@@ -148,10 +148,14 @@ public class WebServiceControllerTest {
 	public void ProductInfoServiceControllerTest() throws Exception{
 		MockHttpSession mocksession = new MockHttpSession();
 
-		this.mockMvc.perform(get(new URI("/productinfo/get_products_items/" + "커피")).session(mocksession))
-				//.andDo(print())
-				.andExpect(status().isOk());
+		this.mockMvc.perform(get("/productinfo/get_products_category").session(mocksession))
+			.andDo(print())
+			.andExpect(status().isOk());
 		
+		this.mockMvc.perform(get(new URI("/productinfo/get_products_items/" + "커피")).session(mocksession))
+				.andDo(print())
+				.andExpect(status().isOk());
+
 		
 		// "get_products_category" need to do test with Session Bean Scope
 		
@@ -182,7 +186,7 @@ public class WebServiceControllerTest {
 		
 		MockHttpSession mocksession = new MockHttpSession();
 		
-		this.mockMvc.perform(get("/productinfo/get_products_category").session(mocksession)).andExpect(status().isOk());
+		//this.mockMvc.perform(get("/productinfo/get_products_category").session(mocksession)).andExpect(status().isOk());
 		
 		this.mockMvc.perform(get("/realtimesalesvolume/todays_stream_data/2016-07-07").session(mocksession))
 			.andDo(print())

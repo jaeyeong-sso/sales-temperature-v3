@@ -65,7 +65,7 @@ public class DaoTest {
 		
 		List<Category> productCategories = categoryDao.listingAllProductCategory();
 		
-
+		/*
 		for(int i=0; i<productCategories.size(); i++){
 			Category cateItem = productCategories.get(i);
 			System.out.println("[CateName] : " + cateItem.getName());
@@ -75,14 +75,19 @@ public class DaoTest {
 				System.out.println("[Product]: " + key + "		[Value]: " + productsMap.get(key).toString());
 			}
 		}
-		
+		*/
+
 		Category category = productCategories.get(0);
 		
+		System.out.println( category.toJsonString() );
+		
+		/*
 		for(String key : category.getProductsMap().keySet()){
 			Product product = category.getProductsMap().get(key);
 	
 			assertEquals(category.getName(), category.getName(), product.getCategory().getName());
 		}
+		*/
 	}
 	
 	

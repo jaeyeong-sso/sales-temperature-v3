@@ -26,7 +26,7 @@ public class AnalyzeSalesVolumeServiceTest {
 	
 	@Before
 	public void setUp(){
-		this.analyzeSalesVolumeService = context.getBean("popularProductsService", AnalyzeSalesVolumeService.class);
+		this.analyzeSalesVolumeService = context.getBean("analyzeSalesVolumeService", AnalyzeSalesVolumeService.class);
 
 	}
 	

@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -174,7 +175,37 @@ public class SalesVolumeDao {
 				"SELECT SUBSTR(date_receipt_num,1,10) AS tr_date, SUBSTR(tr_time,1,2) AS tr_time, num_of_product, sales_amount FROM ext_tr_receipt WHERE SUBSTR(date_receipt_num,1,10) =" + "'" + queryYearMonthDay + "'" +
 			") view_tr_timebase_of_month GROUP BY view_tr_timebase_of_month.tr_time, tr_date ORDER BY tr_time ASC";
 
-		return this.jdbcTemplate.query(queryStr, salesVolumeListMapperByTimebaseOfMonth);
+		List<SalesVolume> retSalesVolumes =  this.jdbcTemplate.query(queryStr, salesVolumeListMapperByTimebaseOfMonth);
+		
+		for(int hour=10 ; hour<=23; hour++){
+			final String hourStr = String.format("%02d", hour);
+			SalesVolume findObject = (SalesVolume)CollectionUtils.find(retSalesVolumes, new org.apache.commons.collections.Predicate() {
+		        public boolean evaluate(Object salesVolume) {
+		            return ((SalesVolume)salesVolume).getOptItemName().equals(hourStr);
+		        }
+		    });
+			
+			if(findObject == null){
+				retSalesVolumes.add(new SalesVolume.SalesVolumeBuilder()
+						.withDate(queryYearMonthDay).withOptItemName(hourStr).withTotalSalesCount(0).withTotalSalesAmount(0)
+						.build());
+			}
+		}
+		
+		SalesVolume findObject = (SalesVolume)CollectionUtils.find(retSalesVolumes, new org.apache.commons.collections.Predicate() {
+	        public boolean evaluate(Object salesVolume) {
+	            return ((SalesVolume)salesVolume).getOptItemName().equals("00");
+	        }
+	    });
+		
+		if(findObject!=null){
+			findObject.setOptItemName("24");
+		} else {
+			retSalesVolumes.add(new SalesVolume.SalesVolumeBuilder()
+					.withDate(queryYearMonthDay).withOptItemName("24").withTotalSalesCount(0).withTotalSalesAmount(0).build());
+		}
+		
+		return retSalesVolumes;
 	}
 	
 }

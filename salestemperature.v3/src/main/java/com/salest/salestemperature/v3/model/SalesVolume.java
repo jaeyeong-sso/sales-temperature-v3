@@ -1,6 +1,8 @@
 package com.salest.salestemperature.v3.model;
 
 import java.util.Comparator;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 public class SalesVolume {
 
@@ -44,6 +46,17 @@ public class SalesVolume {
 				.append(",  totalSalesAmount: ").append(this.totalSalesAmount)
 				.append(",  totalSalesCount: ").append(this.totalSalesCount).toString();
 
+	}
+	
+	public String toJsonString() {
+		JSONObject jsonObj = new JSONObject();
+
+		jsonObj.put("date", this.date);
+		jsonObj.put("optItemName", this.optItemName);
+		jsonObj.put("totalSalesCount", this.totalSalesCount);
+		jsonObj.put("totalSalesAmount", this.totalSalesAmount);
+		
+		return jsonObj.toJSONString();
 	}
 	
 	

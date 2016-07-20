@@ -1,5 +1,6 @@
 package com.salest.salestemperature.v3.service;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -12,8 +13,11 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 
 public class RedisCacheService {
 	
-	public static String TOTAL_SALES_COUNTER_OF_DAY = "total_sales_counter_of_day:";
 	public static String TOTAL_SALES_AMOUNT_OF_DAY  = "saleslog_totalamount_of:";
+	public static String TOTAL_SALES_COUNTER_OF_DAY = "total_sales_counter_of_day:";
+	public static String CATEGORIES_INFO  = "categories_info";
+	public static String MAJOR_PRODUCTS_INFO_OF  = "major_products_info_of:";
+	public static String PASTDAY_TIMEBASE_SALESAMOUNT_OF = "pastday_timebase_salesamount_of:";
 	
 	private static int KEY_EXPIRED_PERIOD = 60*60*24;
 	
@@ -121,5 +125,14 @@ public class RedisCacheService {
 		} finally { 
 			//jedisPool.close();
 		} 
+	}
+	
+	public void addToList(String key, String listItem){
+		jedis.rpush(key, listItem);
+		jedis.expire(key,  60*60*24);
+	}
+	
+	public List<String> getFromList(String key){
+		return jedis.lrange(key, 0, -1);
 	}
 }

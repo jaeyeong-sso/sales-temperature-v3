@@ -3,10 +3,13 @@ package com.salest.salestemperature.v3.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 public class Category {
 	
 	private String name;
-	private Map<String,Product> productsMap;
+	private Map<String,Product> productsMap;	// Key is "ProductName"
 	
 	private Category(CategoryBuilder builder){
 		this.name = builder.name;
@@ -21,6 +24,33 @@ public class Category {
 	}	
 	public Map<String,Product> getProductsMap(){
 		return this.productsMap;
+	}
+	
+
+	private JSONObject toJsonObject() {
+		JSONObject jsonCategoryObj = new JSONObject();
+		
+		JSONArray jsonProducts = new JSONArray();
+		for(String key : this.productsMap.keySet()){
+			JSONObject jsonProductObj = new JSONObject();
+
+			Product product = productsMap.get(key);
+			jsonProductObj.put("name", product.getName());
+			jsonProductObj.put("id", product.getId());
+			jsonProductObj.put("price", product.getPrice());
+			
+			jsonProducts.add(jsonProductObj);
+		}
+		
+		jsonCategoryObj.put("name", this.name);
+		jsonCategoryObj.put("products", jsonProducts);
+		
+		return jsonCategoryObj;
+	}
+	
+	public String toJsonString() {
+		JSONObject jsonCategoryObj = this.toJsonObject();
+		return jsonCategoryObj.toJSONString();
 	}
 	
 	

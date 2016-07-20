@@ -11,6 +11,9 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import com.salest.salestemperature.v3.dao.CategoryDao;
 import com.salest.salestemperature.v3.dao.SalesVolumeDao;
@@ -221,9 +224,36 @@ public class AnalyzeSalesVolumeService {
 	}
 	
 	public List<SalesVolume> getTimebaseSalesVolumeOfDate(String queryYearMonthDay){
-		List<SalesVolume> salesVolumes = salesVolumeDao.listingTimebaseSalesVolumeOfDate(queryYearMonthDay);
 		
-		SalesVolume findObject = (SalesVolume)CollectionUtils.find(salesVolumes, new org.apache.commons.collections.Predicate() {
+		//Read From Redis Cache.
+		String REDIS_KEY = RedisCacheService.PASTDAY_TIMEBASE_SALESAMOUNT_OF  + queryYearMonthDay;
+		List<String> salesVolumesStr = redisCacheService.getFromList(REDIS_KEY);
+		
+		List<SalesVolume> retSalesVolumes = null;
+		
+		if(salesVolumesStr!=null && salesVolumesStr.size()>0){
+			//System.out.println("Read From Redis Cached");
+			retSalesVolumes = new ArrayList<SalesVolume>();
+			
+			for(String salesVolumeStr : salesVolumesStr){
+				try {
+					retSalesVolumes.add(parseSalesVolumeFromJsonObjectString(salesVolumeStr));
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+		} else {
+			retSalesVolumes = salesVolumeDao.listingTimebaseSalesVolumeOfDate(queryYearMonthDay);
+			
+			//Store To Redis Cache.
+			for(SalesVolume salesVolume : retSalesVolumes){
+				redisCacheService.addToList(REDIS_KEY, salesVolume.toJsonString());
+			}
+		}
+		
+		SalesVolume findObject = (SalesVolume)CollectionUtils.find(retSalesVolumes, new org.apache.commons.collections.Predicate() {
 	        public boolean evaluate(Object salesVolume) {
 	            return ((SalesVolume)salesVolume).getOptItemName().equals("00");
 	        }
@@ -233,13 +263,13 @@ public class AnalyzeSalesVolumeService {
 			findObject.setOptItemName("24");
 		}
 		
-		Collections.sort(salesVolumes, new Comparator<SalesVolume>() {
+		Collections.sort(retSalesVolumes, new Comparator<SalesVolume>() {
 			public int compare(SalesVolume first, SalesVolume second) {
 				return first.getOptItemName().compareTo(second.getOptItemName());
 			}
 		});
 		
-		return salesVolumes;
+		return retSalesVolumes;
 	}
 	
 	
@@ -278,5 +308,16 @@ public class AnalyzeSalesVolumeService {
 		});
 		
 		return salesVolumes;
+	}
+	
+	private SalesVolume parseSalesVolumeFromJsonObjectString(String salesVolumeStr) throws ParseException{
+		JSONParser jsonParser = new JSONParser();
+		JSONObject salesVolumeJsonObj = (JSONObject)jsonParser.parse(salesVolumeStr);
+
+		return new SalesVolume.SalesVolumeBuilder()
+					.withDate((String) salesVolumeJsonObj.get("date"))
+					.withOptItemName((String) salesVolumeJsonObj.get("optItemName"))
+					.withTotalSalesAmount(((Long)salesVolumeJsonObj.get("totalSalesAmount")).intValue())
+					.withTotalSalesCount(((Long)salesVolumeJsonObj.get("totalSalesCount")).intValue()).build();
 	}
 }
