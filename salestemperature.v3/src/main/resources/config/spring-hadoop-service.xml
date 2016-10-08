@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:hadoop="http://www.springframework.org/schema/hadoop"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/hadoop
+		http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+
+	<context:property-placeholder location="classpath:properties/hadoop.properties"/>
+	
+	<hdp:configuration>
+		fs.defaultFS=${hd.fs}
+	</hdp:configuration>
+
+	
+	<!-- job task -->
+	
+    <hdp:job-tasklet id="mrjob-tasklet" job-ref="daily-summarize-job" wait-for-completion="true" scope="step" />
+
+	<hdp:job id="daily-summarize-job" 
+		scope="step"
+		input-path="${daily_summarize_record.input.path}" output-path="${daily_summarize_record.output.path}"
+		mapper="com.salest.salestemperature.v3.batch.mapreduce.DailySummarizedMapper"
+		reducer="com.salest.salestemperature.v3.batch.mapreduce.DailySummarizedReducer" />
+
+
+	<!-- tool-runner task -->
+
+	<hdp:tool-tasklet id="tool-tasklet" scope="step">
+		<hdp:tool>
+			<bean class="com.salest.salestemperature.v3.batch.mapreduce.DailySummarizedToolRunner">
+				<constructor-arg ref="hadoopConfiguration" />
+			</bean>
+		</hdp:tool>
+	</hdp:tool-tasklet>
+
+    <hdp:resource-loader id="hadoopResourceLoader" />	
+	<bean id="defaultResourceLoaders" class="org.springframework.data.hadoop.fs.CustomResourceLoaderRegistrar" p:loader-ref="hadoopResourceLoader" />
+    
+</beans>

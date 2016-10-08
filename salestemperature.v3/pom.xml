@@ -13,6 +13,8 @@
 	<spring.version>4.0.3.RELEASE</spring.version>
 	<hibernate.version>3.6.9.Final</hibernate.version>
 	<jersey.version>2.22.1</jersey.version>
+	<spring.data.version>2.4.0.RELEASE</spring.data.version>
+	<spring.batch.version>3.0.6.RELEASE</spring.batch.version>
   </properties>
   
   
@@ -259,6 +261,39 @@
 	    <version>1.1.1</version>
 	</dependency>
 
+
+	<!-- Spring-data-hadoop dependency -->
+	
+	<dependency>
+	    <groupId>org.springframework.data</groupId>
+	    <artifactId>spring-data-hadoop</artifactId>
+        <version>${spring.data.version}</version>
+		<exclusions>
+			<exclusion>
+				<groupId>commons-logging</groupId>
+				<artifactId>commons-logging</artifactId>
+			</exclusion>
+			<exclusion>
+				<artifactId>jdk.tools</artifactId>
+				<groupId>jdk.tools</groupId>
+		    </exclusion>
+		</exclusions>
+	</dependency>
+	<dependency>
+		<groupId>org.codehaus.groovy</groupId>
+		<artifactId>groovy-jsr223</artifactId>
+		<version>2.4.5</version>
+	</dependency>
+	
+	
+	<!-- Spring-Batch dependency -->
+	
+    <dependency>
+        <groupId>org.springframework.batch</groupId>
+        <artifactId>spring-batch-core</artifactId>
+        <version>${spring.batch.version}</version>
+    </dependency>
+    
   </dependencies>
 
 

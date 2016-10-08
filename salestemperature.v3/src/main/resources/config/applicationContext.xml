@@ -3,10 +3,12 @@
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:mvc="http://www.springframework.org/schema/mvc"
 	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:task="http://www.springframework.org/schema/task"
 	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
-		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd">
 
 	<mvc:annotation-driven /> 
 
@@ -14,19 +16,18 @@
 
 	<bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor" />
 	
-	<bean id="dataSource" class="com.salest.salestemperature.v3.dao.DataSource">
+	<bean id="impalaDataSource" class="com.salest.salestemperature.v3.dao.DataSource">
 		<property name="jdbcDriverName" value="com.cloudera.impala.jdbc41.Driver" />
-		
 		<property name="connectionUrl" value="jdbc:impala://salest-master-server:21050/salest" />
 	</bean>
 
 
 	<bean id="salesVolumeDao" class="com.salest.salestemperature.v3.dao.SalesVolumeDao">
-		<property name="dataSource" ref="dataSource" />
+		<property name="dataSource" ref="impalaDataSource" />
 	</bean>
 	
 	<bean id="categoryDao" class="com.salest.salestemperature.v3.dao.CategoryDao">
-		<property name="dataSource" ref="dataSource" />
+		<property name="dataSource" ref="impalaDataSource" />
 	</bean>
 	
 	
@@ -48,5 +49,13 @@
 	<bean id="redisCacheService" class="com.salest.salestemperature.v3.service.RedisCacheService" />
 	
 	<bean id="timeSeriesService" class="com.salest.salestemperature.v3.service.TimeSeriesService" />
+
+	
+	<!--  Scheduled Task -->
+	
+	<bean id="printSchedule " class="com.salest.salestemperature.v3.batch.ScheduledBatchTask" />
+	<task:scheduler id="singleScheduler" pool-size="1" />
+	<task:executor id="singleTaskExecutor" pool-size="1" />
+	<task:annotation-driven executor="singleTaskExecutor" scheduler="singleScheduler" />
 	
 </beans>
